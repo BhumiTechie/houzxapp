@@ -1,4 +1,19 @@
 {
   "name": "Houzx",
-  "displayName": "Houzx"
+  "displayName": "Houzx",
+  "android": {
+    "package": "com.anonymous.houzx"
+  },
+  "expo": {
+    "scheme": "houzx",
+    "newArchEnabled": true,
+    "extra": {
+      "FIREBASE_API_KEY": "AIzaSyAq0Cjq02iyvc3r9TFRJlXsXPMWCLLuy5U",
+      "FIREBASE_AUTH_DOMAIN": "houzx-12490.firebaseapp.com",
+      "FIREBASE_PROJECT_ID": "houzx-12490",
+      "FIREBASE_STORAGE_BUCKET": "houzx-12490.appspot.com",
+      "FIREBASE_MESSAGING_SENDER_ID": "46650836222",
+      "FIREBASE_APP_ID": "1:46650836222:android:22b8bf38c6038627cd51af"
+    }
+  }
 }

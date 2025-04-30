@@ -1,0 +1,10 @@
+{
+    "update": {
+      "channel": "default"
+    },
+    "build": {
+      "development": {},
+      "production": {}
+    }
+  }
+  

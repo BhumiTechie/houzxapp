@@ -1,5 +1,6 @@
-package com.houzx
+package com.anonymous.houzx
 
+import com.houzx.app.BuildConfig
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate
 import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "46650836222",
+    "project_id": "houzx-12490",
+    "storage_bucket": "houzx-12490.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:46650836222:android:22b8bf38c6038627cd51af",
+        "android_client_info": {
+          "package_name": "com.houzx.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "46650836222-f3v8qr7binrm9ub1oa1k3t0hhhb2rlc8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.houzx.app",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "46650836222-sfaffej0a53c7ksaq70pullrvk1neash.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAq0Cjq02iyvc3r9TFRJlXsXPMWCLLuy5U"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "46650836222-sfaffej0a53c7ksaq70pullrvk1neash.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
