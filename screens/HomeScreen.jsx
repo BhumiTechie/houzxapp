@@ -13,6 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 
+
 export default function HomeScreen({navigation}) {
   const featuredProperties = [
     {
@@ -53,23 +54,30 @@ export default function HomeScreen({navigation}) {
     },
   ];
 
-  const renderCard = ({ item }) => (
-    <View style={styles.propertyCard}>
-      <View style={styles.cardHeader}>
-        <Image source={item.image} style={styles.propertyImage} />
-        <AntDesign name="hearto" size={20} color="#05141A" style={styles.heartIcon} />
-      </View>
-      <Text style={styles.propertyTitle}>{item.title}</Text>
-      <Text style={styles.propertySub}>{item.subtitle}</Text>
-      <Text style={styles.propertyLocation}>
-        <Ionicons name="location-outline" size={14} color="#666" /> {item.location}
-      </Text>
-      <View style={styles.propertyDetailsRow}>
-        <Text style={styles.price}>{item.price}</Text>
-        <Text style={styles.area}>{item.area}</Text>
-      </View>
+const renderCard = ({ item }) => (
+  <View style={styles.propertyCard}>
+    <View style={styles.cardHeader}>
+      {/* Uncomment below if you add image */}
+      {/* <Image source={item.image} style={styles.propertyImage} /> */}
+      <View style={styles.propertyImage} /> {/* Placeholder */}
+      <AntDesign name="hearto" size={20} color="#05141A" style={styles.heartIcon} />
     </View>
-  );
+    <Text style={styles.propertyTitle}>{item.title}</Text>
+    <Text style={styles.propertySub}>{item.subtitle}</Text>
+
+    {/* FIXED BLOCK */}
+    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+      <Ionicons name="location-outline" size={14} color="#666" style={{ marginRight: 4 }} />
+      <Text style={styles.propertyLocation}>{item.location}</Text>
+    </View>
+
+    <View style={styles.propertyDetailsRow}>
+      <Text style={styles.price}>{item.price}</Text>
+      <Text style={styles.area}>{item.area}</Text>
+    </View>
+  </View>
+);
+
 
   return (
     <SafeAreaView style={styles.safe}>

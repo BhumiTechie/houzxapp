@@ -55,18 +55,19 @@ const Welcome = ({ navigation }) => {
         </TouchableOpacity>
 
         {/* Sign Up with Email Button */}
-        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Signup')}>
-          <View style={styles.btnInner}>
-            <Image source={require('../assets/mail.png')} style={styles.mailIcon} />
-            <Text style={styles.btnText}>Sign up with Email</Text>
-          </View>
-        </TouchableOpacity>
+       
 
         {/* Google Sign-In Button */}
         <TouchableOpacity style={styles.btn} onPress={handleGoogleSignIn}>
           <View style={styles.btnInner}>
             <Image source={require('../assets/google.png')} style={styles.googleIcon} />
             <Text style={styles.btnText}>Continue with Google</Text>
+          </View>
+        </TouchableOpacity>
+         <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Signup')}>
+          <View style={styles.btnInner}>
+            <Image source={require('../assets/mail.png')} style={styles.mailIcon} />
+            <Text style={styles.btnText}>Sign up with Email</Text>
           </View>
         </TouchableOpacity>
 
@@ -90,22 +91,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#05141A',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: width * 0.05,  // Adding some horizontal padding for smaller screens
+    paddingHorizontal: width * 0.058,  // Adding some horizontal padding for smaller screens
   },
-  bgImage: {
-    width: width * 0.95,  // Adjusted to make it more flexible
-    height: height * 0.3,  // Adjusted height to ensure more of the background is visible
-    position: 'absolute',
-    top: height * 0.03, // Moved it slightly up to show more of the background
-    borderRadius: 1,
-    backgroundColor: '#FFFFFF05',
-    // opacity: 0.3,  // Reduced opacity to make it more subtle
-  },
+bgImage: {
+  width: 393,
+  height: 190,
+  position: 'absolute',
+  top: 99,
+  borderRadius: 1,
+  opacity: 0.80  // 👈 Kam opacity
+},
+
   logo: {
-    width: width * 0.5,  // Adjusted width to be flexible
-    height: height * 0.1,  // Adjusted height to be proportional
+    width: 211,  // Adjusted width to be flexible
+    height: 59,  // Adjusted height to be proportional
     position: 'absolute',
-    top: -height * 0.2  // Adjusted to move the logo down slightly so it doesn't overlap with background
+    top: -height * 0.17 // Adjusted to move the logo down slightly so it doesn't overlap with background
   },
   content: {
     width: '85%',
@@ -114,23 +115,24 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     position: 'absolute',
-    top: -height * 0.09,  // Adjusted for smaller devices
-    fontSize: width * 0.03,  // Dynamic font size
-    color: 'white',
+    top: -height * 0.06,  // Adjusted for smaller devices
+    fontSize: 13  ,  // Dynamic font size
+    color: '#FFFFFFE5',
     textTransform: 'uppercase',
+
   },
   divider: {
     width: 60,
     borderBottomWidth: 2,
     borderBottomColor: '#EBEBEB80',
     position: 'absolute',
-    top: -15,
-    left: width * 0.30,  // Adjusted for better centering on smaller devices
+    top: -12,
+    left: width * 0.30,  
   },
   btn: {
     backgroundColor: '#FFFFFF33',
-    width: width * 0.9,  // Adjusted width for responsiveness
-    height: height * 0.07,  // Adjusted height for consistency
+    width: width * 0.9,  
+    height: height * 0.07,  
     borderRadius: 8,
     justifyContent: 'center',
     marginVertical: 8,

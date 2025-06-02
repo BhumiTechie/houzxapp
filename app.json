@@ -1,11 +1,28 @@
 {
-  "name": "Houzx",
-  "displayName": "Houzx",
-  "android": {
-    "package": "com.anonymous.houzx"
-  },
   "expo": {
+    "name": "Houzx",
+    "slug": "houzx",
     "scheme": "houzx",
-    "newArchEnabled": true
-  }
+    "newArchEnabled": true,
+    "jsEngine": "hermes",
+    "android": {
+      "package": "com.anonymous.houzx",
+      "runtimeVersion": "1.0.0"
+    }
+  },
+  "extra": {
+    "eas": {
+      "projectId": "747b7aa2-b249-453a-95ce-083a1bc9997c"
+    }
+  },
+  "entryPoint": "./index.js",
+  "updates": {
+    "url": "https://u.expo.dev/747b7aa2-b249-453a-95ce-083a1bc9997c"
+  },
+  "ios": {
+    "runtimeVersion": "1.0.0"
+  },
+     "plugins": [
+      "react-native-maps"
+    ]
 }

@@ -1,97 +1,134 @@
-const axios = require('axios');
 const User = require('../models/User');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
-// Generate 4-digit OTP
-const generateOTP = () => Math.floor(1000 + Math.random() * 9000).toString();
-
-// ✅ Send OTP via Fast2SMS API
-const sendOTPViaFast2SMS = async (phoneNumber, otp) => {
-  const options = {
-    method: 'POST',
-    url: 'https://www.fast2sms.com/dev/bulkV2',
-    headers: {
-      'authorization': process.env.FAST2SMS_API_KEY,
-      'Content-Type': 'application/json'
-    },
-    data: {
-      variables_values: otp,
-      route: 'otp',
-      numbers: phoneNumber
-    }
-  };
-
-  const response = await axios.request(options);
-  return response.data;
+// Function to generate OTP
+const generateOTP = () => {
+  return Math.floor(1000 + Math.random() * 9000);  // Random 4-digit number
 };
 
-// ✅ Send OTP API
+// Send OTP
 exports.sendOTP = async (req, res) => {
   const { phoneNumber } = req.body;
   const otp = generateOTP();
-  const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+  const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);  // OTP valid for 10 minutes
+
+  try {
+    let user = await User.findOne({ phoneNumber });
+
+    if (!user) {
+      user = new User({ phoneNumber });
+    }
+
+    // If OTP exists and hasn't expired, resend the OTP
+    if (user.otp && user.otpExpiresAt > Date.now()) {
+      console.log(`Resending OTP to ${phoneNumber}: ${user.otp}`);
+      return res.json({ success: true, message: 'OTP resent successfully' });
+    }
+
+    // Otherwise, generate a new OTP
+    user.otp = otp;
+    user.otpExpiresAt = otpExpiresAt;
+    await user.save();
+
+    console.log(`Generated OTP for ${phoneNumber}: ${otp}`);
+
+    res.json({ success: true, message: 'OTP generated and stored' });
+  } catch (error) {
+    console.error('Error generating OTP:', error);
+    res.status(500).json({ success: false, message: 'Failed to generate OTP' });
+  }
+};
+
+// Verify OTP
+exports.verifyOTP = async (req, res) => {
+  const { phoneNumber, otp } = req.body;
+
+  try {
+    let user = await User.findOne({ phoneNumber });
+
+    if (!user || user.otp !== otp) {
+      return res.status(400).json({ success: false, message: 'Incorrect OTP' });
+    }
+
+    // OTP expired?
+    if (user.otpExpiresAt < Date.now()) {
+      return res.status(400).json({ success: false, message: 'OTP has expired' });
+    }
+
+    res.json({ success: true, message: 'OTP verified successfully' });
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    res.status(500).json({ success: false, message: 'Failed to verify OTP' });
+  }
+};
+
+// Reset Password
+exports.resetPassword = async (req, res) => {
+  const { phoneNumber, newPassword } = req.body;
 
   try {
     let user = await User.findOne({ phoneNumber });
     if (!user) {
-      user = new User({ phoneNumber });
+      return res.status(400).json({ success: false, message: 'User not found' });
+    }
+
+    // Hash the new password before saving
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ success: true, message: 'Password reset successful' });
+  } catch (error) {
+    console.error('Error resetting password:', error);
+    res.status(500).json({ success: false, message: 'Failed to reset password' });
+  }
+};
+
+// Login Route
+exports.login = async (req, res) => {
+  const { phoneNumber, password } = req.body;
+
+  try {
+    const user = await User.findOne({ phoneNumber });
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'User not found' });
+    }
+
+    // Compare entered password with stored hashed password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+    }
+
+    res.json({ success: true, message: 'Login successful', user });
+  } catch (error) {
+    console.error('Error logging in:', error);
+    res.status(500).json({ success: false, message: 'Failed to login' });
+  }
+};
+
+// Resend OTP
+exports.resendOTP = async (req, res) => {
+  const { phoneNumber } = req.body;
+  const otp = generateOTP();  // Generate a new OTP
+  const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);  // OTP valid for 10 minutes
+
+  try {
+    let user = await User.findOne({ phoneNumber });
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'User not found' });
     }
 
     user.otp = otp;
     user.otpExpiresAt = otpExpiresAt;
     await user.save();
 
-    await sendOTPViaFast2SMS(phoneNumber, otp);
+    console.log(`Resent OTP for ${phoneNumber}: ${otp}`);
 
-    res.json({ success: true, message: 'OTP sent successfully' });
+    res.json({ success: true, message: 'OTP resent successfully' });
   } catch (error) {
-    console.error('Error sending OTP:', error);
-    res.status(500).json({ success: false, message: 'Failed to send OTP' });
-  }
-};
-
-// ✅ Verify OTP API
-exports.verifyOTP = async (req, res) => {
-  const { phoneNumber, otp } = req.body;
-
-  try {
-    const user = await User.findOne({ phoneNumber });
-
-    if (!user || user.otp !== otp || user.otpExpiresAt < new Date()) {
-      return res.status(400).json({ success: false, message: 'Invalid or expired OTP' });
-    }
-
-    user.otp = null;
-    user.otpExpiresAt = null;
-    await user.save();
-
-    res.json({ success: true, message: 'OTP verified successfully' });
-  } catch (error) {
-    console.error('Error verifying OTP:', error);
-    res.status(500).json({ success: false, message: 'Error verifying OTP' });
-  }
-};
-
-  
-// Reset Password API Endpoint
-exports.resetPassword = async (req, res) => {
-  const { phoneNumber, newPassword } = req.body;
-
-  try {
-    // Find the user by phone number
-    const user = await User.findOne({ phoneNumber });
-
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    // Here, you can hash the password before saving it for better security
-    user.password = newPassword;  // In a real app, hash this password!
-    await user.save();
-
-    res.json({ message: 'Password updated successfully' });
-  } catch (error) {
-    console.error('Error in resetting password:', error);
-    res.status(500).json({ message: 'Error in resetting password' });
+    console.error('Error resending OTP:', error);
+    res.status(500).json({ success: false, message: 'Failed to resend OTP' });
   }
 };

@@ -16,7 +16,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { auth } from '../firebase';
+
 
 
 const { width } = Dimensions.get('window');
@@ -38,31 +38,58 @@ const LoginScreen = () => {
   }, []);
   
   
-  const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please fill all the fields');
-      return;
-    }
+  // const handleLogin = async () => {
+  //   if (!email || !password) {
+  //     Alert.alert('Error', 'Please fill all the fields');
+  //     return;
+  //   }
   
+  //   const storedEmail = await AsyncStorage.getItem('userEmail');
+  //   const storedPassword = await AsyncStorage.getItem('userPassword');
+  
+  //   if (storedEmail && storedPassword) {
+  //     if (email === storedEmail && password === storedPassword) {
+  //       await AsyncStorage.setItem('isLoggedIn', 'true');
+  //       navigation.reset({
+  //         index: 0,
+  //         routes: [{ name: 'TermsAndConditions' }],
+  //       });
+  //     } else {
+  //       Alert.alert('Login failed', 'Invalid email or password');
+  //     }
+  //   } else {
+  //     Alert.alert('Error', 'No user found. Please sign up first');
+  //   }
+  // };
+  
+  const handleLogin = async () => {
+  if (email.trim() === '' || password.trim() === '') {
+    Alert.alert('Error', 'Please enter both email and password');
+    return;
+  }
+
+  try {
     const storedEmail = await AsyncStorage.getItem('userEmail');
     const storedPassword = await AsyncStorage.getItem('userPassword');
-  
-    if (storedEmail && storedPassword) {
-      if (email === storedEmail && password === storedPassword) {
-        await AsyncStorage.setItem('isLoggedIn', 'true');
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'TermsAndConditions' }],
-        });
-      } else {
-        Alert.alert('Login failed', 'Invalid email or password');
-      }
+
+    console.log('Stored Email:', storedEmail);
+    console.log('Stored Password:', storedPassword);
+
+    if (
+      storedEmail === email.trim().toLowerCase() &&
+      storedPassword === password.trim()
+    ) {
+      Alert.alert('Success', 'Login successful');
+      navigation.navigate('TermsAndConditions');
     } else {
-      Alert.alert('Error', 'No user found. Please sign up first');
+      Alert.alert('Error', 'Invalid email or password');
     }
-  };
-  
-  
+  } catch (error) {
+    console.log('Login error:', error);
+    Alert.alert('Error', 'Failed to login');
+  }
+};
+ 
 
   return (
     <SafeAreaView style={styles.container}>

@@ -29,44 +29,62 @@ export default function SignupScreen({ navigation }) {
 
   const isPasswordMatch = password === confirmPassword;
 
+  // const handleSignup = async () => {
+  //   if (!email || !phone || !password || !confirmPassword) {
+  //     Alert.alert('Error', 'Please fill all the fields');
+  //     return;
+  //   }
+
+  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  //   if (!emailRegex.test(email)) {
+  //     Alert.alert('Error', 'Invalid email address');
+  //     return;
+  //   }
+
+  //   if (!isPasswordMatch) {
+  //     Alert.alert('Error', 'Passwords do not match');
+  //     return;
+  //   }
+
+  //   if (
+  //     password.length < 10 ||
+  //     !/[A-Z]/.test(password) ||
+  //     !/[a-z]/.test(password) ||
+  //     !/[0-9]/.test(password) ||
+  //     !/[!@#$%^&*]/.test(password)
+  //   ) {
+  //     Alert.alert(
+  //       'Weak Password',
+  //       'Password must be at least 10 characters and include uppercase, lowercase, number, and symbol.'
+  //     );
+  //     return;
+  //   }
+
+  //   // Saving email and password to AsyncStorage
+  //   await AsyncStorage.setItem('userEmail', email);
+  //   await AsyncStorage.setItem('userPassword', password);
+
+  //   // ✅ All good
+  //   navigation.navigate('TermsAndConditions');
+  // };
+
   const handleSignup = async () => {
-    if (!email || !phone || !password || !confirmPassword) {
-      Alert.alert('Error', 'Please fill all the fields');
-      return;
-    }
+  if (email.trim() === '' || password.trim() === '') {
+    Alert.alert('Error', 'Please enter both email and password');
+    return;
+  }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      Alert.alert('Error', 'Invalid email address');
-      return;
-    }
-
-    if (!isPasswordMatch) {
-      Alert.alert('Error', 'Passwords do not match');
-      return;
-    }
-
-    if (
-      password.length < 10 ||
-      !/[A-Z]/.test(password) ||
-      !/[a-z]/.test(password) ||
-      !/[0-9]/.test(password) ||
-      !/[!@#$%^&*]/.test(password)
-    ) {
-      Alert.alert(
-        'Weak Password',
-        'Password must be at least 10 characters and include uppercase, lowercase, number, and symbol.'
-      );
-      return;
-    }
-
-    // Saving email and password to AsyncStorage
-    await AsyncStorage.setItem('userEmail', email);
-    await AsyncStorage.setItem('userPassword', password);
-
-    // ✅ All good
+  try {
+    await AsyncStorage.setItem('userEmail', email.trim().toLowerCase());
+    await AsyncStorage.setItem('userPassword', password.trim());
+    Alert.alert('Success', 'Account created successfully');
     navigation.navigate('TermsAndConditions');
-  };
+  } catch (error) {
+    console.log('Error saving user data:', error);
+    Alert.alert('Error', 'Failed to create account');
+  }
+};
+ 
 
   const gap = width * 0.05; // Dynamic gap (5% of screen width)
 
