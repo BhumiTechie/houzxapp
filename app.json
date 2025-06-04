@@ -8,7 +8,17 @@
     "android": {
       "package": "com.anonymous.houzx",
       "runtimeVersion": "1.0.0"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "747b7aa2-b249-453a-95ce-083a1bc9997c"
+      }
+    },
+    "runtimeVersion": "1.0.0",
+    "updates": {
+      "url": "https://u.expo.dev/747b7aa2-b249-453a-95ce-083a1bc9997c"
+    },
+    "ios": {}
   },
   "extra": {
     "eas": {
@@ -22,7 +32,7 @@
   "ios": {
     "runtimeVersion": "1.0.0"
   },
-     "plugins": [
-      "react-native-maps"
-    ]
+  "plugins": [
+    "react-native-maps"
+  ]
 }

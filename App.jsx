@@ -3,7 +3,6 @@ import React, { useState } from 'react'; // Import useState
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-// ✅ Screens
 import Welcome from './screens/Welcome';
 import SignupScreen from './screens/SignupScreen';
 import TermsAndConditionsScreen from './screens/TermsAndConditionsScreen';
@@ -12,7 +11,6 @@ import Enterphone from './screens/Enterphone';
 import OTPScreen from './screens/OTPScreen';
 import ResetPasswordScreen from './screens/ResetPasswordScreen';
 import SplashScreen from './screens/SplashScreen';
-
 import HomeScreen from './screens/HomeScreen';
 import SearchScreen from './screens/SearchScreen';
 import PropertySearchScreen from './screens/PropertySearchScreen';
@@ -21,7 +19,6 @@ import PropertyDetailsScreen from './screens/PropertyDetailsScreen';
 import NearestStationScreen from './screens/NearestStationScreen';
 import NearestSchoolScreen from './screens/NearestSchoolScreen';
 import NearestCollegeScreen from './screens/NearestCollegeScreen';
-// import NearestHospitalScreen from './screens/NearestHospitalScreen'; // Uncommented
 import NearestBusStopScreen from './screens/NearestBusStopScreen';
 import NearestAirportScreen from './screens/NearestAirportScreen';
 
@@ -127,7 +124,7 @@ export default function App() {
  <Stack.Screen name="FurnishedTypeFilterScreen" component={FurnishedTypeFilterScreen} options={{ headerShown: false, title: 'Furnished Type' }} />
  <Stack.Screen name="AmenitiesFilterScreen" component={AmenitiesFilterScreen} options={{ headerShown: false, title: 'Amenities' }} />
  <Stack.Screen name="SuitableForFilterScreen" component={SuitableForFilterScreen} options={{ headerShown: false, title: 'Suitable For' }} />
-        {/* Existing Property Details and Nearest Screens */}
+     
         <Stack.Screen name="SortByModal" component={SortByModal} />
         <Stack.Screen
           name="PropertyDetails"
