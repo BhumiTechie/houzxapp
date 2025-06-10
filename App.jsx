@@ -1,4 +1,3 @@
-// import 'react-native-get-random-values';
 import React, { useState } from 'react'; // Import useState
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';

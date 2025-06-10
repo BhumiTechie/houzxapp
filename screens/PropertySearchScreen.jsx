@@ -10,7 +10,7 @@ import {
     ActivityIndicator, // Import ActivityIndicator
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import Slider from '@react-native-community/slider';
+// import Slider from '@react-native-community/slider';
 import { useRoute } from '@react-navigation/native';
 
 

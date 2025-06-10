@@ -92,12 +92,12 @@ export default function SignupScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="#05141A" barStyle="light-content" />
 
-      {/* Top Bar */}
+      {/* Top Bar */} 
       <View style={styles.topBar}>
         <TouchableOpacity
           onPress={() => {
             if (navigation.canGoBack()) {
-              navigation.goBack();
+              navigation.goBack(); 
             } else {
               navigation.navigate('Welcome');
             }
