@@ -15,7 +15,7 @@ export default function SplashScreen({ navigation }) {
   }, []);
 
   return (
-    <View style={styles.wrapper}>
+    <View style={styles.wrapper}>  
       <Image
         source={require('../assets/group.png')}
         style={styles.bgImage}

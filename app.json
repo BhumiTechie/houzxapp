@@ -2,11 +2,11 @@
   "expo": {
     "name": "Houzx",
     "slug": "houzx",
+    "owner": "bhumika_gupta",
     "entryPoint": "./App.js",
     "scheme": "houzx",
     "jsEngine": "hermes",
     "runtimeVersion": "1.0.0",
-    "newArchEnabled": false,
     "android": {
       "package": "com.anonymous.houzx",
       "runtimeVersion": "1.0.0"
@@ -24,6 +24,7 @@
     },
     "plugins": [
       "expo-web-browser"
-    ]
+    ],
+    "platforms": ["android", "ios", "web"]
   }
 }

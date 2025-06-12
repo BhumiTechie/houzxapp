@@ -1,14 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, StatusBar } from 'react-native';
 import { ArrowLeft } from 'lucide-react-native';
-
+ 
 const NearestAirportScreen = ({ navigation }) => (
     <View style={styles.container}>
         <StatusBar barStyle="light-content" backgroundColor="#06B6D4" />
         <View style={styles.header}>
             <TouchableOpacity onPress={() => navigation.goBack()}>
                 <ArrowLeft size={24} color="#fff" />
-            </TouchableOpacity>
+            </TouchableOpacity> 
             <Text style={styles.headerTitle}>Nearest Airport</Text>
             <View style={{ width: 24 }} />
         </View>

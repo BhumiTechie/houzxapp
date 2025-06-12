@@ -202,35 +202,30 @@ const discovery = {
 };
 
 const Welcome = ({ navigation }) => {
-const [request, response, promptAsync] = AuthSession.useAuthRequest(
-  {
-    clientId: '551111204652-ivkvskaaqr6vrq547nnia3sn9lsvddch.apps.googleusercontent.com',
-    scopes: ['openid', 'profile', 'email'],
-    responseType: 'id_token',  // ✅ important
-    extraParams: {
-      nonce: Math.random().toString(36).substring(2),
+  const redirectUri = AuthSession.makeRedirectUri({ useProxy: true });
+  console.log('👉 Redirect URI:', redirectUri);
+
+  const [request, response, promptAsync] = AuthSession.useAuthRequest(
+    {
+      clientId: 'YOUR_CLIENT_ID_HERE',
+      scopes: ['openid', 'profile', 'email'],
+      responseType: 'id_token',
+      redirectUri,
+      extraParams: {
+        nonce: Math.random().toString(36).substring(2),
+      },
     },
-    redirectUri: AuthSession.makeRedirectUri({
-      useProxy: true,  // ✅ keep this ON for Expo Go
-    }),
-  },
-  discovery
-);
-
-
+    discovery
+  );
 
   useEffect(() => {
     if (response?.type === 'success') {
       const { id_token } = response.params;
-      console.log('✅ ID Token:', id_token);
-
-      // Aap chahe to id_token ko decode karke user info nikal sakte hain
-      // ya sidha yahan se app ki next screen par ja sakte hain
-
+      console.log('✅ Google ID Token:', id_token);
       Alert.alert('Login Successful', 'You have logged in with Google!');
       navigation.navigate('Home');
     } else if (response?.type === 'error') {
-      Alert.alert('Login Failed', 'Google Sign-In failed. Please try again.');
+      Alert.alert('Login Failed', 'Google Sign-In failed.');
     }
   }, [response]);
 
@@ -238,19 +233,20 @@ const [request, response, promptAsync] = AuthSession.useAuthRequest(
     if (request) {
       promptAsync();
     } else {
-      Alert.alert('Error', 'Google Sign-In is not ready yet. Please try again.');
+      Alert.alert('Error', 'Google Sign-In not ready.');
     }
   };
 
   return (
     <View style={styles.container}>
       <Image source={require('../assets/group.png')} style={styles.bgImage} />
-      <View style={styles.content}>
+
+      <View style={styles.wrapper}>
         <Image source={require('../assets/logohouzx.png')} style={styles.logo} resizeMode="contain" />
         <Text style={styles.subtitle}>BUY, RENT AND SELL PROPERTIES</Text>
         <View style={styles.divider} />
 
-        {/* Apple Sign-In Button - For now no action */}
+        {/* Apple */}
         <TouchableOpacity style={styles.btn}>
           <View style={styles.btnInner}>
             <Image source={require('../assets/apple.png')} style={styles.icon} />
@@ -258,7 +254,7 @@ const [request, response, promptAsync] = AuthSession.useAuthRequest(
           </View>
         </TouchableOpacity>
 
-        {/* Google Sign-In Button */}
+        {/* Google */}
         <TouchableOpacity style={styles.btn} onPress={handleGoogleSignIn} disabled={!request}>
           <View style={styles.btnInner}>
             <Image source={require('../assets/google.png')} style={styles.googleIcon} />
@@ -266,7 +262,7 @@ const [request, response, promptAsync] = AuthSession.useAuthRequest(
           </View>
         </TouchableOpacity>
 
-        {/* Email Sign-Up */}
+        {/* Email */}
         <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Signup')}>
           <View style={styles.btnInner}>
             <Image source={require('../assets/mail.png')} style={styles.mailIcon} />
@@ -292,8 +288,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#05141A',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: width * 0.058,
+    justifyContent: 'flex-start',
   },
   bgImage: {
     width: 393,
@@ -301,86 +296,106 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 99,
     borderRadius: 1,
-    opacity: 0.80,
+    opacity: 0.8,
   },
+
+ wrapper: {
+  position: 'absolute',
+  top: 223,
+  width: width - 32, // dynamic width, screen-safe
+  height: 405,
+  paddingHorizontal: 0,
+  alignSelf: 'center',
+  alignItems: 'center',
+},
+
   logo: {
     width: 211,
     height: 59,
-    position: 'absolute',
-    top: -height * 0.17,
-  },
-  content: {
-    width: '85%',
-    alignItems: 'center',
-    marginTop: height * 0.2,
+    marginBottom: 8,
   },
   subtitle: {
-    position: 'absolute',
-    top: -height * 0.06,
-    fontSize: 13,
+    fontFamily: 'System', // Replace with 'SF Pro Text' when loaded via expo-font
+    fontWeight: '500',
+    fontSize: 12,
     color: '#FFFFFFE5',
     textTransform: 'uppercase',
+    textAlign: 'center',
+    letterSpacing: 0.36, // 3%
+    marginTop: 10,
+    marginBottom: 6,
   },
   divider: {
     width: 60,
+    height: 0,
     borderBottomWidth: 2,
     borderBottomColor: '#EBEBEB80',
-    position: 'absolute',
-    top: -12,
-    left: width * 0.30,
+    marginBottom: 18,
+    // width: 363,
+height: 19,
+
   },
-  btn: {
-    backgroundColor: '#FFFFFF33',
-    width: width * 0.9,
-    height: height * 0.07,
-    borderRadius: 8,
-    justifyContent: 'center',
-    marginVertical: 8,
-  },
+ btn: {
+  width: '100%', // fill wrapper safely
+  height: 58,
+  backgroundColor: '#FFFFFF33',
+  borderRadius: 8,
+  marginVertical: 6,
+},
+
   btnInner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingLeft: 16,
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    position: 'relative',
   },
   icon: {
-    width: 19.63,
+    position: 'absolute',
+    top: 17,
+    left: 16,
+    width: 20,
     height: 24,
-    marginRight: 20,
+  },
+  googleIcon: {
+    position: 'absolute',
+    top: 17,
+    left: 16,
+    width: 24,
+    height: 24,
+  },
+  mailIcon: {
+    position: 'absolute',
+    top: 20,
+    left: 16,
+    width: 24,
+    height: 18,
   },
   btnText: {
+    position: 'absolute',
+    top: 20,
+    left: 105,
+    width: 155,
+    height: 19,
+    fontFamily: 'System', // Replace with 'SF Pro Text'
     fontWeight: '500',
-    fontSize: width * 0.04,
-    lineHeight: 16,
-    letterSpacing: -0.08,
-    color: '#FFFFFF',
-    left: 50,
-  },
-  bottomText: {
-    color: '#ccc',
-    marginTop: height * 0.03,
-    fontWeight: '400',
-    fontSize: width * 0.04,
+    fontSize: 16,
     lineHeight: 16,
     letterSpacing: -0.5,
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+  bottomText: {
+    marginTop: 20,
+    color: '#ccc',
+    fontWeight: '400',
+    fontSize: 14,
+    lineHeight: 16,
     textAlign: 'center',
   },
   login: {
-    fontWeight: 'bold',
-    fontSize: width * 0.04,
-    letterSpacing: -0.5,
+    fontWeight: '600',
+    fontSize: 14,
     color: '#3DEFD3',
   },
-  mailIcon: {
-    width: 24,
-    height: 17.91,
-    marginRight: 20,
-    marginTop: 3,
-  },
-  googleIcon: {
-    width: 24,
-    height: 24,
-    marginRight: 20,
-    marginTop: 2,
-  },
-});
-   
+});  
