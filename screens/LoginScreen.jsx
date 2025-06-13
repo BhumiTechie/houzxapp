@@ -1,142 +1,68 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  StatusBar,
   Platform,
-  ScrollView,
-  Image,
-  Alert,
+  StyleSheet,
   Dimensions,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
+import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
+const maxWidth = 361;
 
 const LoginScreen = () => {
   const navigation = useNavigation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [secureText, setSecureText] = useState(true);
+  const [rememberMe, setRememberMe] = useState(false);
 
-  useEffect(() => {
-    const checkLoginStatus = async () => {
-      const storedLoginStatus = await AsyncStorage.getItem('isLoggedIn');
-      if (storedLoginStatus === 'true') {
-        navigation.navigate('TermsAndConditions'); // ❌
-      }
-    };
-    checkLoginStatus();
-  }, []);
-  
-  
-  // const handleLogin = async () => {
-  //   if (!email || !password) {
-  //     Alert.alert('Error', 'Please fill all the fields');
-  //     return;
-  //   }
-  
-  //   const storedEmail = await AsyncStorage.getItem('userEmail');
-  //   const storedPassword = await AsyncStorage.getItem('userPassword');
-  
-  //   if (storedEmail && storedPassword) {
-  //     if (email === storedEmail && password === storedPassword) {
-  //       await AsyncStorage.setItem('isLoggedIn', 'true');
-  //       navigation.reset({
-  //         index: 0,
-  //         routes: [{ name: 'TermsAndConditions' }],
-  //       });
-  //     } else {
-  //       Alert.alert('Login failed', 'Invalid email or password');
-  //     }
-  //   } else {
-  //     Alert.alert('Error', 'No user found. Please sign up first');
-  //   }
-  // };
-  
-  const handleLogin = async () => {
-  if (email.trim() === '' || password.trim() === '') {
-    Alert.alert('Error', 'Please enter both email and password');
-    return;
-  }
-
-  try {
-    const storedEmail = await AsyncStorage.getItem('userEmail');
-    const storedPassword = await AsyncStorage.getItem('userPassword');
-
-    console.log('Stored Email:', storedEmail);
-    console.log('Stored Password:', storedPassword);
-
-    if (
-      storedEmail === email.trim().toLowerCase() &&
-      storedPassword === password.trim()
-    ) {
-      Alert.alert('Success', 'Login successful');
-      navigation.navigate('TermsAndConditions');
-    } else {
-      Alert.alert('Error', 'Invalid email or password');
-    }
-  } catch (error) {
-    console.log('Login error:', error);
-    Alert.alert('Error', 'Failed to login');
-  }
-};
- 
+  const handleLogin = () => {
+    console.log('Logging in with:', { email, password, rememberMe });
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar backgroundColor="#05141A" barStyle="light-content" />
-      {/* Top Bar */}
+    <View style={styles.screen}>
+      {/* 🔙 Top Nav Bar */}
       <View style={styles.topBar}>
-        <TouchableOpacity
-          onPress={() => {
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            } else {
-              navigation.navigate('Welcome');
-            }
-          }}
-          style={styles.backIconWrapper}
-        >
-          <Image source={require('../assets/aarow.png')} style={styles.backIcon} />
+        <Text style={styles.topBarTitle}>Log in</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-
-        <View style={styles.centerTitleWrapper}>
-          <Text style={styles.topBarTitle}>Log in</Text>
-        </View>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scroll}>
+      {/* 🔒 Login Form */}
+      <View style={styles.container}>
         {/* Email */}
         <View style={styles.inputWrapper}>
           <Text style={styles.floatingLabel}>Email</Text>
           <TextInput
-            style={styles.floatingInput}
+            style={styles.textInput}
             placeholder="Enter email"
             placeholderTextColor="#B0B0B0"
             keyboardType="email-address"
+            autoCapitalize="none"
             value={email}
             onChangeText={setEmail}
           />
         </View>
 
+        <View style={{ margin: 20 }} />
+
         {/* Password */}
         <View style={styles.inputWrapper}>
-          <Text style={styles.floatingLabel}>Enter Password</Text>
-          <View style={styles.inputWithIcon}>
+          <Text style={styles.floatingLabel}>Password</Text>
+          <View style={styles.passwordInputContainer}>
             <TextInput
               style={styles.passwordInput}
               placeholder="Enter password"
               placeholderTextColor="#B0B0B0"
               secureTextEntry={secureText}
+              autoCapitalize="none"
               value={password}
               onChangeText={setPassword}
             />
@@ -150,158 +76,186 @@ const LoginScreen = () => {
           </View>
         </View>
 
-        {/* Row: Remember & Forgot */}
-        <View style={styles.row}>
-          <Text style={styles.remember}>☐ Remember Me</Text>
+        <View style={{ height: 8 }} />
+
+        {/* Remember Me + Forgot Password */}
+        <View style={styles.rememberForgotRow}>
+          <TouchableOpacity
+            style={styles.rememberMeWrapper}
+            onPress={() => setRememberMe(!rememberMe)}
+          >
+            <View style={[styles.checkbox, rememberMe && styles.checkedBox]}>
+              {rememberMe && (
+                <Ionicons name="checkmark" size={14} color="#fff" />
+              )}
+            </View>
+            <Text style={[styles.rememberMeText, rememberMe && { color: '#000' }]}>
+              Remember Me
+            </Text>
+          </TouchableOpacity>
+
           <TouchableOpacity onPress={() => navigation.navigate('Enterphone')}>
-            <Text style={styles.forgot}>Forgot Password?</Text>
+            <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Login Button */}
+        <View style={{ height: 8 }} />
+
+        {/* Log In Button */}
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginText}>Log in</Text>
+          <Text style={styles.loginButtonText}>Log in</Text>
         </TouchableOpacity>
 
-        {/* Sign up */}
-        <View style={styles.signupWrapper}>
-          <Text style={styles.signupText}>Don’t have an account?</Text>
+        <View style={{ height: 8 }} />
+
+        {/* Sign Up Prompt */}
+        <View style={styles.signupRow}>
+          <Text style={styles.signupPrompt}>Don’t have an account? </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-            <Text style={styles.signupLink}> Sign up.</Text>
+            <Text style={styles.signupLink}>Sign up.</Text>
           </TouchableOpacity>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </View>
   );
 };
 
-export default LoginScreen;
-
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#fff',
   },
-
   topBar: {
+    height: 54,
     backgroundColor: '#05141A',
-    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0, // Adjusted padding for Android/iOS
-    paddingHorizontal: width * 0.05,  // Adjusted for responsiveness
-    height: 50,
-  },
-
-  backIconWrapper: {
-    zIndex: 2
-  },
-
-  backIcon: {
-    width: 24,
-    height: 24,
-    resizeMode: 'contain',
-    position: 'absolute',
-    bottom: 10,
-    left: 0,
-    right: 0,
-  },
-
-  centerTitleWrapper: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    top: 10,
-    alignItems: 'center',
+    position: 'relative',
   },
   topBarTitle: {
-    color: '#fff',
-    fontSize: 20,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+    fontSize: 18,
     fontWeight: '600',
-    // top: 14,
+    color: '#fff',
+    zIndex: 1,
   },
-  scroll: {
-    alignItems: 'center',
-    paddingVertical: 20,
+  backButton: {
+    position: 'absolute',
+    left: 12,
+    zIndex: 2,
+  },
+  container: {
+    width: Math.min(width * 0.9, maxWidth),
+    alignSelf: 'center',
+    marginTop: 24,
   },
   inputWrapper: {
-    width: width * 0.9 > 361 ? 361 : width * 0.9,
     height: 54,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#B0B0B0',
-    marginVertical: 6,
     paddingHorizontal: 12,
     backgroundColor: '#fff',
+    justifyContent: 'center',
   },
   floatingLabel: {
     position: 'absolute',
     top: -10,
-    left: 14,
+    left: 10,
     backgroundColor: '#fff',
     paddingHorizontal: 4,
     fontSize: 12,
-    color: '#333',
+    color: '#717171',
     zIndex: 1,
   },
-  floatingInput: {
+  textInput: {
     fontSize: 16,
-    fontWeight: '400',
     color: '#000',
     height: '100%',
-    paddingTop: 14,
+    paddingTop: Platform.OS === 'android' ? 14 : 0,
+  },
+  passwordInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: '100%',
   },
   passwordInput: {
     flex: 1,
     fontSize: 16,
     color: '#000',
-    paddingTop: 14,
+    paddingTop: Platform.OS === 'android' ? 14 : 0,
   },
-  inputWithIcon: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  row: {
-    width: width * 0.9 > 361 ? 361 : width * 0.9,
+  rememberForgotRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 10,
+    alignItems: 'center',
   },
-  remember: {
-    color: '#8F8F8F',
-    fontSize: 14,
+  rememberMeWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  forgot: {
-    color: '#009CA0',
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  loginButton: {
-    backgroundColor: '#009CA0',
-    borderRadius: 8,
-    width: width * 0.9 > 361 ? 361 : width * 0.9,
-    height: 54,
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 1.5,
+    borderColor: '#B0B0B0',
+    borderRadius: 4,
+    marginRight: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 12,
   },
-  loginText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
+  checkedBox: {
+    backgroundColor: '#009CA0',
+    borderColor: '#009CA0',
   },
-  signupWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
-  signupText: {
+  rememberMeText: {
     fontSize: 14,
     color: '#8F8F8F',
   },
-  signupLink: {
-    color: '#009CA0',
-    fontWeight: '500',
+  forgotPasswordText: {
+    color: '#5E5E5E',
     fontSize: 14,
+    fontWeight: '500',
+  },
+
+  loginButton: {
+    width: '100%', // full width of container
+    maxWidth: 361, // limit max size for large screens
+    height: 54,
+    backgroundColor: '#009CA0',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    top:26,
+    gap:20
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+
+
+  signupRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    top:28
+  },
+  signupPrompt: {
+    fontSize: 14,
+    color: '#5E5E5E',
+  },
+  signupLink: {
+    fontSize: 14,
+    color: '#009CA0',
+    fontWeight: '600',
   },
 });
+
+export default LoginScreen;

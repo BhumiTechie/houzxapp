@@ -316,35 +316,42 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
 
-  passwordInfo: {
-    width: width * 0.9,  // Adjusted for responsiveness
-    fontSize: 14,
-    fontWeight: '400',
-    lineHeight: 14,
-    letterSpacing: -0.5,
-    color: '#717171',
-    marginTop: 2,
-    left: 10,
-  },
+passwordInfo: {
+  width: '100%',
+  fontSize: 13,
+  lineHeight: 14,
+  color: '#717171',
+  marginTop: 8,
+  marginLeft: 4,       // Thoda left alignment ke liye
+  marginBottom: 6,     // Neeche ke gap ke liye
+  textAlign: 'left',
+},
 
-  button: {
-    width: width * 0.9,  // 90% of screen width for responsiveness
-    height: 54,  // Fixed height of 54px
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 8,
-    backgroundColor: '#009CA0',
-    marginTop: 20,
-  },
 
-  buttonText: {
-    fontWeight: '500',
-    fontSize: 16,
-    lineHeight: 20,
-    letterSpacing: -0.5,
-    textAlign: 'center',
-    color: '#FFFFFF',
-  },
+button: {
+width: Math.min(width * 0.9, 361),
+  height: 54,
+  paddingTop: 17,
+  paddingBottom: 17,
+  paddingLeft: 10,
+  paddingRight: 10,
+  justifyContent: 'center',
+  alignItems: 'center',
+  borderRadius: 8, // Spacing/2
+  backgroundColor: '#009CA0',
+  alignSelf: 'center',
+  marginTop: 50,
+},
+
+buttonText: {
+  fontWeight: '500',
+  fontSize: 16,
+  lineHeight: 20,
+  letterSpacing: -0.5,
+  textAlign: 'center',
+  color: '#FFFFFF',
+},
+
 
   footerText: {
     fontFamily: 'SF Pro Text', // SF Pro Text font-family
@@ -369,7 +376,6 @@ const styles = StyleSheet.create({
     letterSpacing: -0.5,
     textAlign: 'center',
     color: '#000',  // Black color for "Log in." part
-    top:5
   },
 
 });
