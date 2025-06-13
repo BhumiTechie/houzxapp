@@ -47,9 +47,10 @@ exports.verifyOTP = async (req, res) => {
   try {
     let user = await User.findOne({ phoneNumber });
 
-    if (!user || user.otp !== otp) {
-      return res.status(400).json({ success: false, message: 'Incorrect OTP' });
-    }
+ if (!user || String(user.otp) !== String(otp)) {
+  return res.status(400).json({ success: false, message: 'Incorrect OTP' });
+}
+
 
     // OTP expired?
     if (user.otpExpiresAt < Date.now()) {

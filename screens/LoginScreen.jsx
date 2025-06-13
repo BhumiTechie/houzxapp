@@ -23,6 +23,9 @@ const LoginScreen = () => {
 
   const handleLogin = () => {
     console.log('Logging in with:', { email, password, rememberMe });
+
+    // ✅ Navigate to Home screen
+    navigation.navigate('HomeScreen');
   };
 
   return (
@@ -220,10 +223,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
   },
-
   loginButton: {
-    width: '100%', // full width of container
-    maxWidth: 361, // limit max size for large screens
+    width: '100%',
+    maxWidth: 361,
     height: 54,
     backgroundColor: '#009CA0',
     borderRadius: 8,
@@ -231,21 +233,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
-    top:26,
-    gap:20
+    top: 26,
+    gap: 20,
   },
   loginButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },
-
-
   signupRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    top:28
+    top: 28,
   },
   signupPrompt: {
     fontSize: 14,

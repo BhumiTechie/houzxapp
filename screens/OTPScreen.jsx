@@ -7,10 +7,10 @@ import {
   StyleSheet,
   SafeAreaView,
   StatusBar,
-  Image,
-  Platform,
   Dimensions,
+  Platform,
 } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons'; // ✅ Correct import
 import axios from 'axios';
 
 const { width } = Dimensions.get('window');
@@ -41,34 +41,29 @@ const OTPScreen = ({ route, navigation }) => {
         alert('OTP Verified!');
         navigation.navigate('ResetPasswordScreen', { phoneNumber });
       } else {
-        setError(response.data.message);
+        setError(response.data.message || 'Verification failed.');
       }
-    } catch (error) {
-      console.error(error);
-      if (error.response?.data?.message) {
-        setError(error.response.data.message);
-      } else {
-        setError('Error verifying OTP');
-      }
+    } catch (err) {
+      console.error(err);
+      setError(err?.response?.data?.message || 'Error verifying OTP');
     }
   };
 
   const handleChange = (text, index) => {
-    const updatedOtp = [...otp];
-    updatedOtp[index] = text;
-    setOtp(updatedOtp);
+    const newOtp = [...otp];
+    newOtp[index] = text;
+    setOtp(newOtp);
 
-    if (text) {
-      if (index < otp.length - 1) {
-        inputRefs.current[index + 1].focus();
-      }
-    } else if (index > 0) {
-      inputRefs.current[index - 1].focus();
+    if (text && index < otp.length - 1) {
+      inputRefs.current[index + 1]?.focus();
+    } else if (!text && index > 0) {
+      inputRefs.current[index - 1]?.focus();
     }
   };
 
   const resendOTP = async () => {
     setIsResendDisabled(true);
+    setResendMessage('');
     try {
       const response = await axios.post('http://192.168.39.141:5000/auth/resend-otp', {
         phoneNumber,
@@ -77,36 +72,27 @@ const OTPScreen = ({ route, navigation }) => {
       if (response.data.success) {
         setResendMessage('OTP has been resent successfully.');
         setOtp(['', '', '', '']);
-        inputRefs.current[0].focus();
+        inputRefs.current[0]?.focus();
       } else {
-        setResendMessage(response.data.message);
+        setResendMessage(response.data.message || 'Could not resend OTP');
       }
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       setResendMessage('Error resending OTP');
     } finally {
-      setTimeout(() => setIsResendDisabled(false), 30000); // Cooldown 30 sec
+      setTimeout(() => setIsResendDisabled(false), 30000);
     }
   };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar backgroundColor="#05141A" barStyle="light-content" />
-      <View style={styles.topBar}>
-        <TouchableOpacity
-          style={styles.backIconWrapper}
-          onPress={() => {
-            if (navigation.canGoBack()) {
-              navigation.goBack();
-            } else {
-              navigation.navigate('Welcome');
-            }
-          }}
-        >
-          <Image source={require('../assets/aarow.png')} style={styles.backIcon} />
-        </TouchableOpacity>
 
+      <View style={styles.topBar}>
         <Text style={styles.topBarTitle}>Log in</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color="#fff" />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.container}>
@@ -125,26 +111,26 @@ const OTPScreen = ({ route, navigation }) => {
               onChangeText={(text) => handleChange(text.replace(/[^0-9]/g, ''), index)}
               keyboardType="number-pad"
               maxLength={1}
-              autoFocus={index === 0}
+              returnKeyType="next"
             />
           ))}
         </View>
 
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
+        {!!error && <Text style={styles.errorText}>{error}</Text>}
 
         <View style={styles.resendWrapper}>
           <Text style={styles.resendText}>
             Didn’t receive an OTP?{' '}
             <Text
               style={[styles.resendLink, isResendDisabled && { opacity: 0.5 }]}
-              onPress={!isResendDisabled ? resendOTP : null}
+              onPress={!isResendDisabled ? resendOTP : undefined}
             >
               Resend
             </Text>
           </Text>
         </View>
 
-        {resendMessage ? <Text style={styles.resendMessage}>{resendMessage}</Text> : null}
+        {!!resendMessage && <Text style={styles.resendMessage}>{resendMessage}</Text>}
 
         <TouchableOpacity style={styles.button} onPress={handleVerifyOTP}>
           <Text style={styles.buttonText}>Continue</Text>
@@ -157,20 +143,17 @@ const OTPScreen = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   container: { flex: 1, paddingHorizontal: 20, paddingTop: 40 },
-  header: { fontSize: 20, fontWeight: '600', marginBottom: 10, textAlign: 'left' },
+  header: { fontSize: 20, fontWeight: '800', marginBottom: 10, color: '#222' },
   subtext: { fontSize: 14, color: '#707070', marginBottom: 30 },
   bold: { fontWeight: '600', color: '#000' },
+
   topBar: {
+    height: 54,
     backgroundColor: '#05141A',
-    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 10 : 60,
-    paddingBottom: 15,
-    paddingHorizontal: 16,
     position: 'relative',
   },
-  backIconWrapper: { paddingRight: 20, zIndex: 2 },
-  backIcon: { width: 24, height: 24, resizeMode: 'contain' },
   topBarTitle: {
     fontSize: 20,
     fontWeight: '600',
@@ -180,21 +163,36 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-  otpContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 25,
+  backButton: {
+    position: 'absolute',
+    left: 12,
+    zIndex: 2,
   },
-  otpInput: {
-    width: width * 0.18,
-    height: width * 0.18,
-    borderWidth: 1,
-    borderRadius: 6,
-    borderColor: '#C0C0C0',
-    textAlign: 'center',
-    fontSize: 20,
-    color: '#000',
-  },
+
+ otpContainer: {
+  width: 240,
+  height: 54,
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignSelf: 'center',
+  marginBottom: 25,
+  
+},
+
+otpInput: {
+  width: 54,
+  height: 54,
+  borderWidth: 1,
+  borderColor: '#C2C2C2',     // Updated outline color ✅
+  borderRadius: 6,
+  backgroundColor: '#fff',
+  textAlign: 'center',
+  fontSize: 20,
+  color: '#000',
+  left:-36
+},
+
+
   button: {
     backgroundColor: '#009CA0',
     borderRadius: 8,
@@ -204,24 +202,24 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: width * 0.9,
     height: 54,
-    flexDirection: 'row',
     justifyContent: 'center',
     marginTop: 10,
   },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   errorText: { color: 'red', marginBottom: 20 },
-  resendWrapper: { width: 361, height: 19, alignSelf: 'center', marginBottom: 20 },
+  resendWrapper: {
+    alignSelf: 'center',
+    marginBottom: 20,
+  },
   resendText: {
-    fontFamily: 'SF Pro Text',
-    fontWeight: '400',
     fontSize: 16,
-    lineHeight: 19,
-    letterSpacing: -0.5,
     color: '#000',
     textAlign: 'center',
+    left:-36
   },
-  resendLink: { color: '#009CA0', fontWeight: '600', fontFamily: 'SF Pro Text' },
-  resendMessage: { color: 'green', marginTop: 10, textAlign: 'center' },
+  resendLink: { color: '#009CA0', fontWeight: '600' },
+  resendMessage: { color: 'green', marginTop: 10, textAlign: 'center' }, 
 });
 
-export default OTPScreen;
+
+export default OTPScreen; 
