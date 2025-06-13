@@ -245,7 +245,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    top: 28,
+    top: 32,
   },
   signupPrompt: {
     fontSize: 14,

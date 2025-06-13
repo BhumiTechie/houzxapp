@@ -8,9 +8,9 @@ import {
   SafeAreaView,
   StatusBar,
   Dimensions,
-  Platform,
+  Platform
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons'; // ✅ Correct import
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 
 const { width } = Dimensions.get('window');
@@ -32,10 +32,15 @@ const OTPScreen = ({ route, navigation }) => {
     }
 
     try {
-      const response = await axios.post('http://192.168.39.141:5000/auth/verify-otp', {
-        phoneNumber,
-        otp: enteredOtp,
-      });
+      console.log('🔐 Sending OTP verification:', { phoneNumber, otp: enteredOtp });
+
+      const response = await axios.post(
+        'http://192.168.36.141:5000/auth/verify-otp',
+        { phoneNumber, otp: enteredOtp },
+        { timeout: 10000 }
+      );
+
+      console.log('✅ Backend response:', response.data);
 
       if (response.data.success) {
         alert('OTP Verified!');
@@ -44,8 +49,8 @@ const OTPScreen = ({ route, navigation }) => {
         setError(response.data.message || 'Verification failed.');
       }
     } catch (err) {
-      console.error(err);
-      setError(err?.response?.data?.message || 'Error verifying OTP');
+      console.error('❌ Verify OTP error:', err?.message);
+      setError(err?.response?.data?.message || 'Network error verifying OTP');
     }
   };
 
@@ -64,10 +69,16 @@ const OTPScreen = ({ route, navigation }) => {
   const resendOTP = async () => {
     setIsResendDisabled(true);
     setResendMessage('');
+    setError('');
+
     try {
-      const response = await axios.post('http://192.168.39.141:5000/auth/resend-otp', {
-        phoneNumber,
-      });
+      const response = await axios.post(
+        'http://192.168.36.141:5000/auth/resend-otp',
+        { phoneNumber },
+        { timeout: 10000 }
+      );
+
+      console.log('📨 Resend OTP response:', response.data);
 
       if (response.data.success) {
         setResendMessage('OTP has been resent successfully.');
@@ -77,8 +88,8 @@ const OTPScreen = ({ route, navigation }) => {
         setResendMessage(response.data.message || 'Could not resend OTP');
       }
     } catch (err) {
-      console.error(err);
-      setResendMessage('Error resending OTP');
+      console.error('❌ Resend OTP error:', err?.message);
+      setResendMessage('Network error resending OTP');
     } finally {
       setTimeout(() => setIsResendDisabled(false), 30000);
     }
@@ -168,30 +179,63 @@ const styles = StyleSheet.create({
     left: 12,
     zIndex: 2,
   },
+inputWrapper: {
+    height: 54,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#B0B0B0',
+    paddingHorizontal: 12,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+  },
+  floatingLabel: {
+    position: 'absolute',
+    top: -10,
+    left: 10,
+    backgroundColor: '#fff',
+    paddingHorizontal: 4,
+    fontSize: 12,
+    color: '#717171',
+    zIndex: 1,
+  },
+  textInput: {
+    fontSize: 16,
+    color: '#000',
+    height: '100%',
+    paddingTop: Platform.OS === 'android' ? 14 : 0,
+  },
+  passwordInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: '100%',
+  },
+  passwordInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#000',
+    paddingTop: Platform.OS === 'android' ? 14 : 0,
+  },
+  otpContainer: {
+    width: 240,
+    height: 54,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignSelf: 'center',
+    marginBottom: 25,
+    left:-36
+  },
 
- otpContainer: {
-  width: 240,
-  height: 54,
-  flexDirection: 'row',
-  justifyContent: 'space-between',
-  alignSelf: 'center',
-  marginBottom: 25,
-  
-},
-
-otpInput: {
-  width: 54,
-  height: 54,
-  borderWidth: 1,
-  borderColor: '#C2C2C2',     // Updated outline color ✅
-  borderRadius: 6,
-  backgroundColor: '#fff',
-  textAlign: 'center',
-  fontSize: 20,
-  color: '#000',
-  left:-36
-},
-
+  otpInput: {
+    width: 54,
+    height: 54,
+    borderWidth: 1,
+    borderColor: '#C2C2C2',
+    borderRadius: 6,
+    backgroundColor: '#fff',
+    textAlign: 'center',
+    fontSize: 20,
+    color: '#000',
+  },
 
   button: {
     backgroundColor: '#009CA0',
@@ -206,7 +250,7 @@ otpInput: {
     marginTop: 10,
   },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  errorText: { color: 'red', marginBottom: 20 },
+  errorText: { color: 'red', marginBottom: 20, textAlign: 'center' },
   resendWrapper: {
     alignSelf: 'center',
     marginBottom: 20,
@@ -218,8 +262,7 @@ otpInput: {
     left:-36
   },
   resendLink: { color: '#009CA0', fontWeight: '600' },
-  resendMessage: { color: 'green', marginTop: 10, textAlign: 'center' }, 
+  resendMessage: { color: 'green', marginTop: 10, textAlign: 'center' },
 });
 
-
-export default OTPScreen; 
+export default OTPScreen;

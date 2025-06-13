@@ -1,7 +1,19 @@
 import React, { useState } from 'react';
-import { View, TextInput, Text, TouchableOpacity, StyleSheet, SafeAreaView, ScrollView, Alert, StatusBar, Image, Platform } from 'react-native';
+import {
+  View,
+  TextInput,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  ScrollView,
+  Alert,
+  StatusBar,
+  Image,
+  Platform,
+} from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import Icon from 'react-native-vector-icons/Ionicons'; // Or any other icon library
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const ResetPasswordScreen = () => {
   const [newPassword, setNewPassword] = useState('');
@@ -28,15 +40,18 @@ const ResetPasswordScreen = () => {
       Alert.alert('Error', 'Passwords do not match.');
       return;
     }
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]).{10,}$/;
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]).{10,}$/;
     if (!passwordRegex.test(newPassword)) {
-      Alert.alert('Error', 'Your password must be minimum 10 characters long and contain at least 1 number, 1 symbol, uppercase and lowercase letter.');
+      Alert.alert(
+        'Error',
+        'Your password must be minimum 10 characters long and contain at least 1 number, 1 symbol, uppercase and lowercase letter.'
+      );
       return;
     }
 
     try {
-   const response = await fetch('http://192.168.39.141:5000/auth/reset-password', {
-
+      const response = await fetch('http://192.168.36.141:5000/auth/reset-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,58 +78,78 @@ const ResetPasswordScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="light-content" />
-     
+
       <View style={styles.topBar}>
-  <TouchableOpacity
-    style={{ paddingRight: 10 }}
-    onPress={() => {
-      if (navigation.canGoBack()) {
-        navigation.goBack();
-      } else {
-        navigation.navigate('Welcome');
-      }
-    }}
-  >
-    <Image source={require('../assets/aarow.png')} style={styles.backIcon} />
-  </TouchableOpacity>
+        <TouchableOpacity
+          style={{ paddingRight: 10 }}
+          onPress={() => {
+            if (navigation.canGoBack()) {
+              navigation.goBack();
+            } else {
+              navigation.navigate('Welcome');
+            }
+          }}
+        >
+          <Image source={require('../assets/aarow.png')} style={styles.backIcon} />
+        </TouchableOpacity>
 
-  <Text style={styles.topBarTitle}>Recover Password</Text>
+        <Text style={styles.topBarTitle}>Recover Password</Text>
+        <View style={{ width: 34 }} />
+      </View>
 
-  {/* Optional right placeholder to balance layout if needed */}
-  <View style={{ width: 34 }} /> 
-</View>
-
-        <ScrollView contentContainerStyle={styles.scroll}>
-        {/* Added paddingTop here to shift the inputs down */}
+      <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.inputSection}>
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="New Password"
-              secureTextEntry={!showNewPassword}
-              onChangeText={setNewPassword}
-              value={newPassword}
-            />
-            <TouchableOpacity style={styles.eyeIcon} onPress={toggleNewPasswordVisibility}>
-              <Icon name={showNewPassword ? 'eye-outline' : 'eye-off-outline'} size={24} color="gray" />
-            </TouchableOpacity>
+          {/* New Password */}
+          <View style={styles.inputWrapper}>
+            <Text style={styles.floatingLabel}>New Password</Text>
+            <View style={styles.inputRow}>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Enter Password"
+                placeholderTextColor="#B0B0B0"
+                autoCapitalize="none"
+                value={newPassword}
+                onChangeText={setNewPassword}
+                secureTextEntry={!showNewPassword}
+              />
+              <TouchableOpacity onPress={toggleNewPasswordVisibility}>
+                <Icon
+                  name={showNewPassword ? 'eye-off' : 'eye'}
+                  size={20}
+                  color="#888"
+                  style={styles.eyeIcon}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
 
-          <View style={styles.inputContainer}>
-            <TextInput
-              style={styles.input}
-              placeholder="Confirm Password"
-              secureTextEntry={!showConfirmPassword}
-              onChangeText={setConfirmPassword}
-              value={confirmPassword}
-            />
-            <TouchableOpacity style={styles.eyeIcon} onPress={toggleConfirmPasswordVisibility}>
-              <Icon name={showConfirmPassword ? 'eye-outline' : 'eye-off-outline'} size={24} color="gray" />
-            </TouchableOpacity>
+          {/* Confirm Password */}
+          <View style={styles.inputWrapper}>
+            <Text style={styles.floatingLabel}>Confirm Password</Text>
+            <View style={styles.inputRow}>
+              <TextInput
+                style={styles.textInput}
+                placeholder="Enter Password"
+                placeholderTextColor="#B0B0B0"
+                autoCapitalize="none"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                secureTextEntry={!showConfirmPassword}
+              />
+              <TouchableOpacity onPress={toggleConfirmPasswordVisibility}>
+                <Icon
+                  name={showConfirmPassword ? 'eye-off' : 'eye'}
+                  size={20}
+                  color="#888"
+                  style={styles.eyeIcon}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
 
           <Text style={styles.passwordRequirements}>
-            Your password must be at least 10 characters long, containing at least 1 number, 1 symbol, and both uppercase and lowercase letters.
+            Your password must be minimum 10 characters long. Contain at least 1 number, 1 symbol,
+            Uppercase and lower case.
           </Text>
 
           <TouchableOpacity style={styles.button} onPress={updatePassword}>
@@ -131,7 +166,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-
   topBar: {
     backgroundColor: '#05141A',
     flexDirection: 'row',
@@ -140,15 +174,10 @@ const styles = StyleSheet.create({
     paddingBottom: 2,
     paddingHorizontal: 18,
   },
-  
-  backIconWrapper: {
-    paddingRight: 20,
-    zIndex: 2,
-  },
   backIcon: {
     width: 24,
     height: 24,
-    top:-20,
+    top: -20,
     resizeMode: 'contain',
   },
   topBarTitle: {
@@ -165,24 +194,37 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   inputSection: {
-    paddingTop: 30, // Adjusted padding to move inputs down
+    paddingTop: 30,
   },
-  inputContainer: {
+  inputWrapper: {
+    marginBottom: 20,
+  },
+  floatingLabel: {
+    position: 'absolute',
+    top: -10,
+    left: 10,
+    backgroundColor: '#fff',
+    paddingHorizontal: 4,
+    fontSize: 12,
+    color: '#717171',
+    zIndex: 1,
+  },
+  inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 50,
     borderWidth: 1,
     borderColor: '#B0B0B0',
     borderRadius: 8,
     paddingHorizontal: 12,
-    marginBottom: 20,
+    height: 50,
   },
-  input: {
+  textInput: {
     flex: 1,
     fontSize: 16,
+    color: '#000',
   },
   eyeIcon: {
-    padding: 8,
+    marginLeft: 8,
   },
   passwordRequirements: {
     fontSize: 12,

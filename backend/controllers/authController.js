@@ -2,16 +2,16 @@ const User = require('../models/User');
 const bcrypt = require('bcrypt');
 require('dotenv').config();
 
-// Function to generate OTP
+// Generate a random 4-digit OTP
 const generateOTP = () => {
-  return Math.floor(1000 + Math.random() * 9000);  // Random 4-digit number
+  return Math.floor(1000 + Math.random() * 9000);
 };
 
 // Send OTP
 exports.sendOTP = async (req, res) => {
   const { phoneNumber } = req.body;
   const otp = generateOTP();
-  const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);  // OTP valid for 10 minutes
+  const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
   try {
     let user = await User.findOne({ phoneNumber });
@@ -20,19 +20,16 @@ exports.sendOTP = async (req, res) => {
       user = new User({ phoneNumber });
     }
 
-    // If OTP exists and hasn't expired, resend the OTP
     if (user.otp && user.otpExpiresAt > Date.now()) {
       console.log(`Resending OTP to ${phoneNumber}: ${user.otp}`);
       return res.json({ success: true, message: 'OTP resent successfully' });
     }
 
-    // Otherwise, generate a new OTP
     user.otp = otp;
     user.otpExpiresAt = otpExpiresAt;
     await user.save();
 
     console.log(`Generated OTP for ${phoneNumber}: ${otp}`);
-
     res.json({ success: true, message: 'OTP generated and stored' });
   } catch (error) {
     console.error('Error generating OTP:', error);
@@ -45,24 +42,30 @@ exports.verifyOTP = async (req, res) => {
   const { phoneNumber, otp } = req.body;
 
   try {
-    let user = await User.findOne({ phoneNumber });
+    const user = await User.findOne({ phoneNumber });
 
- if (!user || String(user.otp) !== String(otp)) {
-  return res.status(400).json({ success: false, message: 'Incorrect OTP' });
-}
+    if (!user) {
+      return res.status(400).json({ success: false, message: 'User not found' });
+    }
 
+    // OTP mismatch
+    if (String(user.otp) !== String(otp)) {
+      return res.status(400).json({ success: false, message: 'Incorrect OTP' });
+    }
 
-    // OTP expired?
+    // OTP expired
     if (user.otpExpiresAt < Date.now()) {
       return res.status(400).json({ success: false, message: 'OTP has expired' });
     }
 
     res.json({ success: true, message: 'OTP verified successfully' });
+
   } catch (error) {
     console.error('Error verifying OTP:', error);
     res.status(500).json({ success: false, message: 'Failed to verify OTP' });
   }
 };
+
 
 // Reset Password
 exports.resetPassword = async (req, res) => {
@@ -74,7 +77,6 @@ exports.resetPassword = async (req, res) => {
       return res.status(400).json({ success: false, message: 'User not found' });
     }
 
-    // Hash the new password before saving
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
     await user.save();
@@ -86,7 +88,7 @@ exports.resetPassword = async (req, res) => {
   }
 };
 
-// Login Route
+// Login
 exports.login = async (req, res) => {
   const { phoneNumber, password } = req.body;
 
@@ -96,7 +98,6 @@ exports.login = async (req, res) => {
       return res.status(400).json({ success: false, message: 'User not found' });
     }
 
-    // Compare entered password with stored hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
@@ -112,8 +113,8 @@ exports.login = async (req, res) => {
 // Resend OTP
 exports.resendOTP = async (req, res) => {
   const { phoneNumber } = req.body;
-  const otp = generateOTP();  // Generate a new OTP
-  const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);  // OTP valid for 10 minutes
+  const otp = generateOTP();
+  const otpExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
   try {
     let user = await User.findOne({ phoneNumber });
@@ -126,7 +127,6 @@ exports.resendOTP = async (req, res) => {
     await user.save();
 
     console.log(`Resent OTP for ${phoneNumber}: ${otp}`);
-
     res.json({ success: true, message: 'OTP resent successfully' });
   } catch (error) {
     console.error('Error resending OTP:', error);
