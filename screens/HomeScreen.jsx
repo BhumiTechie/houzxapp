@@ -1,20 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ImageBackground,
-  ScrollView,
+  Image,
   TouchableOpacity,
   SafeAreaView,
+  ScrollView,
   FlatList,
-  Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 
+export default function HomeScreen({ navigation }) {
+  const [activeTab, setActiveTab] = useState('Home');
 
-export default function HomeScreen({navigation}) {
   const featuredProperties = [
     {
       id: '1',
@@ -23,7 +23,6 @@ export default function HomeScreen({navigation}) {
       location: 'Gangapur Rd, Nashik, Maharashtra',
       price: '₹1.2Cr',
       area: '1200 sqft.',
-      // image: require('./assets/house1.jpg'),
     },
     {
       id: '2',
@@ -32,7 +31,6 @@ export default function HomeScreen({navigation}) {
       location: 'Gangapur Rd, Nashik',
       price: '₹1.2Cr',
       area: '1200 sqft.',
-      // image: require('./assets/house2.jpg'),
     },
     {
       id: '3',
@@ -41,7 +39,6 @@ export default function HomeScreen({navigation}) {
       location: 'Nashik, Maharashtra',
       price: '₹1.5Cr',
       area: '1400 sqft.',
-      // image: require('./assets/house3.jpg'),
     },
     {
       id: '4',
@@ -50,50 +47,73 @@ export default function HomeScreen({navigation}) {
       location: 'Nashik, Maharashtra',
       price: '₹75L',
       area: '800 sqft.',
-      // image: require('./assets/house4.jpg'),
     },
   ];
 
-const renderCard = ({ item }) => (
-  <View style={styles.propertyCard}>
-    <View style={styles.cardHeader}>
-      {/* Uncomment below if you add image */}
-      {/* <Image source={item.image} style={styles.propertyImage} /> */}
-      <View style={styles.propertyImage} /> {/* Placeholder */}
-      <AntDesign name="hearto" size={20} color="#05141A" style={styles.heartIcon} />
-    </View>
-    <Text style={styles.propertyTitle}>{item.title}</Text>
-    <Text style={styles.propertySub}>{item.subtitle}</Text>
+  const iconMap = {
+    Home: require('../assets/home.png'),
+    Messages: require('../assets/message.png'),
+    Saved: require('../assets/saved.png'),
+    Account: require('../assets/account.png'),
+    'Post Ad': require('../assets/postad.png'),
+  };
 
-    {/* FIXED BLOCK */}
-    <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
-      <Ionicons name="location-outline" size={14} color="#666" style={{ marginRight: 4 }} />
-      <Text style={styles.propertyLocation}>{item.location}</Text>
+  const renderCard = ({ item }) => (
+    <View style={styles.propertyCard}>
+      <View style={styles.cardHeader}>
+        <View style={styles.propertyImage} />
+        <AntDesign name="hearto" size={20} color="#05141A" style={styles.heartIcon} />
+      </View>
+      <Text style={styles.propertyTitle}>{item.title}</Text>
+      <Text style={styles.propertySub}>{item.subtitle}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+        <Ionicons name="location-outline" size={14} color="#666" style={{ marginRight: 4 }} />
+        <Text style={styles.propertyLocation}>{item.location}</Text>
+      </View>
+      <View style={styles.propertyDetailsRow}>
+        <Text style={styles.price}>{item.price}</Text>
+        <Text style={styles.area}>{item.area}</Text>
+      </View>
     </View>
+  );
 
-    <View style={styles.propertyDetailsRow}>
-      <Text style={styles.price}>{item.price}</Text>
-      <Text style={styles.area}>{item.area}</Text>
-    </View>
-  </View>
-);
-
+  const renderNavItem = (label) => {
+    const isActive = activeTab === label;
+    return (
+      <TouchableOpacity
+        key={label}
+        style={styles.navItem}
+        onPress={() => setActiveTab(label)}
+      >
+        <Image
+          source={iconMap[label]}
+          style={[
+            styles.navIcon,
+            { tintColor: isActive ? '#009CA0' : '#666' },
+          ]}
+          resizeMode="contain"
+        />
+        <Text style={[styles.navText, { color: isActive ? '#009CA0' : '#666' }]}>
+          {label}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView 
+      <ScrollView
         style={styles.container}
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{ paddingBottom: 16 }}
       >
         <View style={styles.logoContainer}>
           <Image source={require('../assets/logohouzx.png')} style={styles.logo} resizeMode="contain" />
         </View>
 
         <View style={styles.section}>
-        <TouchableOpacity style={styles.searchBox} onPress={() => navigation.navigate('SearchScreen')}>
-  <Image source={require('../assets/card1.png')} style={styles.bannerImg} resizeMode="cover" />
-</TouchableOpacity>
-
+          <TouchableOpacity style={styles.searchBox} onPress={() => navigation.navigate('SearchScreen')}>
+            <Image source={require('../assets/card1.png')} style={styles.bannerImg} resizeMode="cover" />
+          </TouchableOpacity>
 
           <TouchableOpacity style={styles.buyBox}>
             <Text style={styles.buyText}>BUY A PROPERTY</Text>
@@ -101,19 +121,11 @@ const renderCard = ({ item }) => (
           </TouchableOpacity>
         </View>
 
-        <Text style={styles.sectionTitle}>AI Property Finder</Text>   {/* <<< Yeh ab bahar aaya */}
+        <Text style={styles.sectionTitle}>AI Property Finder</Text>
 
-<View style={styles.aiSection}>
-  <View style={styles.aiContent}>
-    <View style={styles.aiTextContainer}>
-      <Text style={styles.aiSubTitle}>Chat with our AI Property Finder</Text>
-      <Text style={styles.aiSub}>Search for rental properties & new properties to buy.</Text>
-      <Text style={styles.comingSoon}>Coming Soon</Text>
-    </View>
-    <Image source={require('../assets/robot.png')} style={styles.aiImage} resizeMode="contain" />
-  </View>
-</View>
-
+        <View style={styles.comingCardContainer}>
+          <Image source={require('../assets/coming.png')} style={styles.comingCard} resizeMode="contain" />
+        </View>
 
         <Text style={styles.featuredTitle}>Featured Properties</Text>
         <FlatList
@@ -127,31 +139,11 @@ const renderCard = ({ item }) => (
       </ScrollView>
 
       <View style={styles.bottomNavigation}>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="home-outline" size={24} color="#05141A" />
-          <Text style={styles.navText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="chatbubble-outline" size={24} color="#666" />
-          <Text style={styles.navText}>Messages</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="heart-outline" size={24} color="#666" />
-          <Text style={styles.navText}>Saved</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="person-outline" size={24} color="#666" />
-          <Text style={styles.navText}>Account</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="add-circle-outline" size={30} color="#666" />
-          <Text style={styles.navText}>Post Ad</Text>
-        </TouchableOpacity>
+        {['Home', 'Messages', 'Saved', 'Account', 'Post Ad'].map(renderNavItem)}
       </View>
     </SafeAreaView>
   );
 }
-
 
 const styles = StyleSheet.create({
   safe: {
@@ -168,7 +160,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#05141A',
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden',
   },
   logo: {
     width: 120,
@@ -199,7 +190,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: '#ccc',
-    backgroundColor: '#A14B00',
+    backgroundColor: '#9A4C04D9',
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -220,53 +211,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     color: '#05141A',
   },
-  
-  aiSection: {
-    backgroundColor: '#05141A',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-    marginHorizontal: 16,  
-  },
-  aiTitle: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  aiContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  aiTextContainer: {
-    flex: 1,
-    marginRight: 12,
-  },
-  aiSubTitle: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  aiSub: {
-    color: '#bbb',
-    fontSize: 14,
-    marginBottom: 8,
-  },
-  comingSoon: {
-    color: '#00D8C0',
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  aiImage: {
-    width: 80,
-    height: 80,
-  },
   featuredTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 16,
-    paddingHorizontal: 16,   // ===> Title align hoga
+    paddingHorizontal: 16,
   },
   featuredListContent: {
     paddingHorizontal: 8,
@@ -285,6 +234,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 120,
     borderRadius: 8,
+    backgroundColor: '#ccc',
   },
   heartIcon: {
     position: 'absolute',
@@ -338,5 +288,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     marginTop: 4,
+  },
+  navIcon: {
+    width: 26,
+    height: 26,
+    marginBottom: 2,
+  },
+  comingCardContainer: {
+    marginHorizontal: 16,
+    marginBottom: 24,
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  comingCard: {
+    width: '100%',
+    height: 180,
+    borderRadius: 12,
   },
 });
