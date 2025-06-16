@@ -122,7 +122,7 @@ const PropertySearchScreen = ({ navigation }) => {
               onPress={() => setSearchCity('')}
               style={styles.clearButton}
             >
-              <Icon name="close" size={16} color="#597C8A" />
+              <Icon name="close" size={16} color="#FFFFFF " />
             </TouchableOpacity>
           )}
         </View>
@@ -143,7 +143,7 @@ const PropertySearchScreen = ({ navigation }) => {
               onPress={() => setSearchLocation('')}
               style={styles.clearButton}
             >
-              <Icon name="close" size={16} color="#597C8A" />
+              <Icon name="close" size={16} color="#FFFFFF" />
             </TouchableOpacity>
           )}
         </View>
@@ -385,7 +385,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#111827',
+    backgroundColor: '#597C8A',
     marginLeft: 8,
   },
   scrollContent: { flex: 1, paddingHorizontal: 16, paddingTop: 16 },

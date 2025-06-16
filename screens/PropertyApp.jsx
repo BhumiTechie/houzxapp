@@ -16,7 +16,8 @@ import SortByModal from './SortByModal';
 import sortIcon from '../assets/sort.png';
 import filterIcon from '../assets/filter.png';
 import mapIcon from '../assets/map.png';
-
+import { Dimensions } from 'react-native';
+const { width, height } = Dimensions.get('window');
 // import Geolocation from 'react-native-geolocation-service'; // Uncomment when using Geolocation
 
 const PropertyApp = () => {
@@ -299,16 +300,18 @@ const styles = StyleSheet.create({
         elevation: 2,
         justifyContent: 'space-between',
     },
-   headerActions: {
-  flexDirection: 'row',
+headerActions: {
+  flexDirection: 'row', // 👈 Add this
+  justifyContent: 'space-around', // 👈 Optional for even spacing
   alignItems: 'center',
-  justifyContent: 'space-between',
-  width: 392,
-  height: 56,
-  paddingHorizontal: 12, // Assuming "Spacing/3" ~ 12px
-//   marginTop: 108,      
-  marginLeft: 1,          // Left position
+  width: width * 0.95,
+  height: height * 0.07,
+//   marginTop: height * 0.13,
+  paddingHorizontal: width * 0.03,
+  backgroundColor: '#fff',
 },
+
+
 
     actionButton: {
         flexDirection: 'row',

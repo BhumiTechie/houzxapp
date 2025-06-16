@@ -201,16 +201,17 @@ const PropertyDetailsScreen = ({ navigation, route }) => {
                 {/* Letting Details - Always shown */}
                 <View style={styles.card}>
                     <Text style={styles.sectionTitle}>Letting Details</Text>
-                    <LettingDetailItem label="Available From" value="25/05/2025" />
-                    <LettingDetailItem label="Minimum Stay" value="6 Months" />
-                    <LettingDetailItem label="Maximum Stay" value="None" />
-                    {/* Conditionally show Rent and Deposit here if not a shared property */}
-                    {!isSharedProperty && (
+                            {!isSharedProperty && (
                         <>
                             <LettingDetailItem label="Rent" value="₹1200" />
                             <LettingDetailItem label="Deposit" value="₹7200" />
                         </>
                     )}
+                    <LettingDetailItem label="Available From" value="25/05/2025" />
+                    <LettingDetailItem label="Minimum Stay" value="6 Months" />
+                    <LettingDetailItem label="Maximum Stay" value="None" />
+                    {/* Conditionally show Rent and Deposit here if not a shared property */}
+            
                 </View>
 
                 <TouchableOpacity style={styles.card}>
@@ -225,7 +226,7 @@ const PropertyDetailsScreen = ({ navigation, route }) => {
 
                 {/* Map Section */}
                 <View style={styles.card}>
-                    <Text style={styles.sectionTitle}>Location</Text>
+                    {/* <Text style={styles.sectionTitle}>Location</Text> */}
                     <Image
                         source={{
                             uri: 'https://maps.googleapis.com/maps/api/staticmap?center=Gangapur+Road,Nashik&zoom=15&size=400x200&markers=color:red%7Clabel:P%7CGangapur+Road,Nashik&key=YOUR_GOOGLE_MAPS_API_KEY'
@@ -453,7 +454,7 @@ const styles = StyleSheet.create({
     map: { width: '100%', height: 180, marginVertical: 12 },
     sectionTitle: { fontSize: 16, fontWeight: 'bold', marginBottom: 10 },
     descriptionText: { fontSize: 14, color: '#4B5563', lineHeight: 22 },
-    viewMore: { fontSize: 14, color: '#047857', marginTop: 6 },
+    viewMore: { fontSize: 14, color: '#009CA0', marginTop: 6 },
     amenitiesGrid: {
         flexDirection: 'row',
         flexWrap: 'wrap',
