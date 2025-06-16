@@ -13,14 +13,16 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import SortByModal from './SortByModal';
-// import Geolocation from 'react-native-geolocation-service';
+import sortIcon from '../assets/sort.png';
+import filterIcon from '../assets/filter.png';
+import mapIcon from '../assets/map.png';
+
+// import Geolocation from 'react-native-geolocation-service'; // Uncomment when using Geolocation
 
 const PropertyApp = () => {
     const route = useRoute();
     const navigation = useNavigation();
     const filters = route.params || {};
-    console.log('Filters received in PropertyApp:', filters);
-
     const [isSortModalVisible, setIsSortModalVisible] = useState(false);
     const [sortBy, setSortBy] = useState('Default');
     const [propertyListings, setPropertyListings] = useState([]);
@@ -126,8 +128,13 @@ const PropertyApp = () => {
     ];
 
     useEffect(() => {
+        // Dynamically set header title
+        navigation.setOptions({
+            title: filters.location || 'Properties',
+        });
+
         setError(null);
-        setPropertyListings(dummyData); // Initially load all dummy data
+        setPropertyListings(dummyData);
 
         const requestLocationPermission = async () => {
             if (Platform.OS === 'android') {
@@ -142,7 +149,7 @@ const PropertyApp = () => {
                     );
                     if (granted === PermissionsAndroid.RESULTS.GRANTED) {
                         console.log('Location permission granted.');
-                        fetchLocation();
+                        // fetchLocation();
                     } else {
                         console.log('Location permission denied.');
                     }
@@ -150,52 +157,23 @@ const PropertyApp = () => {
                     console.warn(err);
                 }
             } else {
-                fetchLocation(); // iOS doesn't require explicit permission here upfront
+                // fetchLocation();
             }
         };
 
-        const fetchLocation = () => {
-            Geolocation.getCurrentPosition(
-                (position) => {
-                    console.log('Current Location:', position);
-                    setCurrentLocation({
-                        latitude: position.coords.latitude,
-                        longitude: position.coords.longitude,
-                    });
-                },
-                (error) => {
-                    console.log('Location fetch error:', error);
-                },
-                { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-            );
-        };
-
         requestLocationPermission();
+    }, [filters.location]);
 
-    }, []);
-
-    const openSortModal = () => {
-        setIsSortModalVisible(true);
-    };
-
-    const closeSortModal = () => {
-        setIsSortModalVisible(false);
-    };
-
+    const openSortModal = () => setIsSortModalVisible(true);
+    const closeSortModal = () => setIsSortModalVisible(false);
     const handleSort = (option) => {
         setSortBy(option);
-        console.log('Sorting by:', option);
         setIsSortModalVisible(false);
     };
-
     const handlePropertyPress = (item) => {
-        console.log('Clicked property:', item.name);
         navigation.navigate('PropertyDetailsScreen', { property: item });
     };
-
-    const goToFilters = () => {
-        navigation.navigate('FilterScreen');
-    };
+    const goToFilters = () => navigation.navigate('FilterScreen');
 
     const PropertyCard = ({ item }) => (
         <TouchableOpacity onPress={() => handlePropertyPress(item)} style={styles.propertyCard}>
@@ -252,32 +230,28 @@ const PropertyApp = () => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            {currentLocation && (
-                <View style={styles.locationInfo}>
-                    <Text>Latitude: {currentLocation.latitude.toFixed(6)}</Text>
-                    <Text>Longitude: {currentLocation.longitude.toFixed(6)}</Text>
-                </View>
-            )}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: 10 }}>
-                    {/* <Icon name="arrow-back" size={24} color="#000" /> */}
-                </TouchableOpacity>
-                <View style={styles.headerActions}>
-                    <TouchableOpacity style={styles.actionButton} onPress={openSortModal}>
-                        <Icon name="sort" size={24} color="#000" />
-                        <Text style={styles.actionText}>Sort</Text>
-                    </TouchableOpacity>
-                    <View style={styles.separator} />
-                    <TouchableOpacity style={styles.actionButton} onPress={goToFilters}>
-                        <Icon name="filter-list" size={24} color="#000" />
-                        <Text style={styles.actionText}>Filter</Text>
-                    </TouchableOpacity>
-                    <View style={styles.separator} />
-                    <TouchableOpacity style={styles.actionButton}>
-                        <Icon name="map" size={24} color="#000" />
-                        <Text style={styles.actionText}>Map</Text>
-                    </TouchableOpacity>
-                </View>
+            <View style={styles.headerActions}>
+  <TouchableOpacity style={styles.actionButton} onPress={openSortModal}>
+    <Image source={sortIcon} style={styles.iconImage} />
+    <Text style={styles.actionText}>Sort</Text>
+  </TouchableOpacity>
+
+  <View style={styles.separator} />
+
+  <TouchableOpacity style={styles.actionButton} onPress={goToFilters}>
+    <Image source={filterIcon} style={styles.iconImage} />
+    <Text style={styles.actionText}>Filter</Text>
+  </TouchableOpacity>
+
+  <View style={styles.separator} />
+
+  <TouchableOpacity style={styles.actionButton}>
+    <Image source={mapIcon} style={styles.iconImage} />
+    <Text style={styles.actionText}>Map</Text>
+  </TouchableOpacity>
+</View>
+
             </View>
 
             <FlatList
@@ -325,10 +299,17 @@ const styles = StyleSheet.create({
         elevation: 2,
         justifyContent: 'space-between',
     },
-    headerActions: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
+   headerActions: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  width: 392,
+  height: 56,
+  paddingHorizontal: 12, // Assuming "Spacing/3" ~ 12px
+//   marginTop: 108,      
+  marginLeft: 1,          // Left position
+},
+
     actionButton: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -339,6 +320,12 @@ const styles = StyleSheet.create({
         color: '#000',
         fontSize: 12,
     },
+    iconImage: {
+  width: 20,
+  height: 20,
+  resizeMode: 'contain',
+},
+
     separator: {
         width: 1,
         height: 20,

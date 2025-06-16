@@ -181,10 +181,9 @@ export default function App() {
         <Stack.Screen
           name="PropertyApp"
           component={PropertyApp}
-          options={{ headerShown: true, title: 'Properties' }}
+          options={{ headerShown: true}}
         />
-        {/* Note: There's a duplicate 'PropertyDetailsScreen' entry. I've kept the one with options={{ headerShown: false }}.
-           If 'PropertyDetailsScreen' and 'PropertyDetails' are meant to be different, please clarify. */}
+
         <Stack.Screen
           name="SearchScreen"
           component={SearchScreen}
