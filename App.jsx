@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { UserProvider } from './context/UserContext'; // ✅ Context import
+// import MainTabs from './MainTabs';
+
 
 // Screens
 import Welcome from './screens/Welcome';
@@ -106,6 +108,8 @@ export default function App() {
           <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
           <Stack.Screen name="SearchScreen" component={SearchScreen} />
           <Stack.Screen name="PropertyApp" component={PropertyApp} />
+     
+
 
           {/* Dynamic Screens */}
           <Stack.Screen name="FilterScreen">
