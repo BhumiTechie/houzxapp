@@ -15,12 +15,15 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUser } from '../context/UserContext';
 
 const { width, height } = Dimensions.get('window'); // Getting screen dimensions
 
 export default function SignupScreen({ navigation }) {
   const [secureText, setSecureText] = useState(true);
   const [secureConfirm, setSecureConfirm] = useState(true);
+  const { setUser } = useUser(); // 👈 Add this just below useState
+
 
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -67,16 +70,49 @@ export default function SignupScreen({ navigation }) {
   //   // ✅ All good
   //   navigation.navigate('TermsAndConditions');
   // };
+const handleSignup = async () => {
+  if (!email || !phone || !password || !confirmPassword) {
+    Alert.alert('Error', 'Please fill all the fields');
+    return;
+  }
 
-  const handleSignup = async () => {
-  if (email.trim() === '' || password.trim() === '') {
-    Alert.alert('Error', 'Please enter both email and password');
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    Alert.alert('Error', 'Invalid email address');
+    return;
+  }
+
+  if (!isPasswordMatch) {
+    Alert.alert('Error', 'Passwords do not match');
+    return;
+  }
+
+  if (
+    password.length < 10 ||
+    !/[A-Z]/.test(password) ||
+    !/[a-z]/.test(password) ||
+    !/[0-9]/.test(password) ||
+    !/[!@#$%^&*]/.test(password)
+  ) {
+    Alert.alert(
+      'Weak Password',
+      'Password must be at least 10 characters and include uppercase, lowercase, number, and symbol.'
+    );
     return;
   }
 
   try {
     await AsyncStorage.setItem('userEmail', email.trim().toLowerCase());
     await AsyncStorage.setItem('userPassword', password.trim());
+
+    // ✅ Save user data in global context
+    setUser({
+      name: 'User', // Optional: add name field if you collect it later
+      email: email.trim().toLowerCase(),
+      phone: phone.trim(),
+      profilePic: 'https://i.pravatar.cc/150?u=' + email, // auto avatar
+    });
+
     Alert.alert('Success', 'Account created successfully');
     navigation.navigate('TermsAndConditions');
   } catch (error) {
@@ -84,6 +120,7 @@ export default function SignupScreen({ navigation }) {
     Alert.alert('Error', 'Failed to create account');
   }
 };
+
  
 
   const gap = width * 0.05; // Dynamic gap (5% of screen width)

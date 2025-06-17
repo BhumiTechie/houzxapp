@@ -7,25 +7,56 @@ import {
   Platform,
   StyleSheet,
   Dimensions,
+  Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUser } from '../context/UserContext'; // ✅ import context
 
 const { width } = Dimensions.get('window');
 const maxWidth = 361;
 
 const LoginScreen = () => {
   const navigation = useNavigation();
+  const { setUser } = useUser(); // ✅ context hook
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [secureText, setSecureText] = useState(true);
   const [rememberMe, setRememberMe] = useState(false);
 
-  const handleLogin = () => {
-    console.log('Logging in with:', { email, password, rememberMe });
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter both email and password');
+      return;
+    }
 
-    // ✅ Navigate to Home screen
-    navigation.navigate('HomeScreen');
+    try {
+      const savedEmail = await AsyncStorage.getItem('userEmail');
+      const savedPassword = await AsyncStorage.getItem('userPassword');
+      const savedPhone = await AsyncStorage.getItem('userPhone');
+
+      if (
+        email.trim().toLowerCase() === savedEmail?.toLowerCase() &&
+        password === savedPassword
+      ) {
+        // ✅ Set user in global context
+        setUser({
+          name: 'User',
+          email: savedEmail,
+          phone: savedPhone || '',
+          profilePic: `https://i.pravatar.cc/150?u=${savedEmail}`,
+        });
+
+        Alert.alert('Success', 'Login successful');
+        navigation.navigate('HomeScreen');
+      } else {
+        Alert.alert('Error', 'Invalid email or password');
+      }
+    } catch (error) {
+      console.log('Login Error:', error);
+      Alert.alert('Error', 'Something went wrong during login');
+    }
   };
 
   return (

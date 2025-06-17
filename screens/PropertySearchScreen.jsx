@@ -9,15 +9,15 @@ import {
   StyleSheet,
   ActivityIndicator,
   Image,
+  Dimensions // Import Dimensions to get screen width for responsive slider length
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useRoute } from '@react-navigation/native';
-import Slider from '@react-native-community/slider';
+import MultiSlider from '@ptomasroos/react-native-multi-slider'; // MultiSlider for both Radius and Budget
 
 // 🖼️ Import custom PNG icons
 // IMPORTANT: Ensure these paths are correct relative to where this component is saved.
 // For example, if this file is in 'screens/' and assets are in 'assets/', use '../assets/'.
-// 🖼️ Import custom PNG icons
 import WholePropertyIcon from '../assets/whole.png';
 import SharedPropertyIcon from '../assets/shared.png';
 import FullyFurnishedIcon from '../assets/fullyfurnished.png';
@@ -29,15 +29,18 @@ import VillaIcon from '../assets/vila.png';
 import PenthouseIcon from '../assets/penthouse.png';
 import StudioIcon from '../assets/studio.png';
 
+const { width: screenWidth } = Dimensions.get('window'); // Get screen width for slider length
+
 const PropertySearchScreen = ({ navigation }) => {
   const route = useRoute();
   const { city: initialCityParam, location: initialLocationParam } = route.params || {};
 
   // State variables for various filters
-  const [selectedPropertyType, setSelectedPropertyType] = useState('whole');
-  const [radius, setRadius] = useState(0.0);
-  const [budget, setBudget] = useState(0.0);
-  const [selectedRooms, setSelectedRooms] = useState('2BHK'); // Default as per screenshot
+  const [selectedPropertyType, setSelectedPropertyType] = useState(null);
+  // Radius is now an array for min and max values
+  const [radiusRange, setRadiusRange] = useState([0.0, 6.0]); // Default to 0.0 km to 6.0 km
+  const [budgetRange, setBudgetRange] = useState([0.0, 2.1]); // Default to 0.0 L to 2.1 L
+  const [selectedRooms, setSelectedRooms] = useState(null); // Default as per screenshot
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState({
     apartment: true, // Defaulting apartment to true as per screenshot
     bungalow: false,
@@ -62,6 +65,10 @@ const PropertySearchScreen = ({ navigation }) => {
     if (initialLocationParam) setSearchLocation(initialLocationParam);
   }, [initialCityParam, initialLocationParam]);
 
+  // Calculate dynamic slider length
+  // Subtract paddingHorizontal (16 * 2) and some extra for the thumbs/margins
+  const sliderLength = screenWidth - (16 * 2) - 30; // Adjust 30 as needed for visual fit
+
   // Handler for the "Search Properties" button
   const handleSearchProperties = async () => {
     setIsLoading(true);
@@ -76,8 +83,10 @@ const PropertySearchScreen = ({ navigation }) => {
       propertyTypes: Object.keys(selectedPropertyTypes).filter((key) => selectedPropertyTypes[key]),
       rooms: selectedRooms,
       furnishType: Object.keys(selectedFurnishType).filter((key) => selectedFurnishType[key]),
-      budget,
-      radius,
+      minBudget: budgetRange[0], // Pass minBudget
+      maxBudget: budgetRange[1], // Pass maxBudget
+      minRadius: radiusRange[0], // Pass minRadius
+      maxRadius: radiusRange[1], // Pass maxRadius
     });
   };
 
@@ -190,40 +199,49 @@ const PropertySearchScreen = ({ navigation }) => {
           </View>
         </View>
 
-        {/* Radius Slider Section */}
+        {/* Radius Slider Section (now using MultiSlider for range) */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Radius</Text>
-          <Text style={styles.sliderValue}>{radius.toFixed(1)} km</Text>
-          <Slider
-            style={{ width: '100%', height: 40 }}
-            minimumValue={0}
-            maximumValue={6}
+          <View style={styles.sliderLabels}>
+            <Text style={styles.sliderValueLeft}>{radiusRange[0].toFixed(1)} km</Text>
+            <Text style={styles.sliderValueRight}>{radiusRange[1].toFixed(1)} km</Text>
+          </View>
+          <MultiSlider
+            values={radiusRange}
+            sliderLength={sliderLength}
+            onValuesChange={setRadiusRange}
+            min={0}
+            max={6}
             step={0.1}
-            value={radius}
-            onValueChange={setRadius}
-            minimumTrackTintColor="#009CA0"
-            maximumTrackTintColor="#e5e7eb"
-            thumbTintColor="#009CA0"
+            allowOverlap={false}
+            snapped
+            trackStyle={styles.multiSliderTrack}
+            selectedStyle={styles.multiSliderSelectedTrack} // Teal between thumbs
+            unselectedStyle={styles.multiSliderUnselectedTrack} // Light gray outside thumbs
+            markerStyle={styles.multiSliderMarker} // White thumbs
           />
         </View>
 
-        {/* Budget Slider Section */}
+        {/* Budget Slider Section (using react-native-multi-slider for two thumbs) */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Budget</Text>
-          <View style={styles.budgetSliderLabels}>
-            <Text style={styles.budgetSliderValueLeft}>₹ {budget.toFixed(1)} L</Text>
-            <Text style={styles.budgetSliderValueRight}>₹ 2.L</Text>
+          <View style={styles.sliderLabels}>
+            <Text style={styles.sliderValueLeft}>₹ {budgetRange[0].toFixed(1)} L</Text>
+            <Text style={styles.sliderValueRight}>₹ {budgetRange[1].toFixed(1)} L</Text>
           </View>
-          <Slider
-            style={{ width: '100%', height: 40 }}
-            minimumValue={0}
-            maximumValue={2.1} // Adjusted max value to match "₹ 2.L" in screenshot
+          <MultiSlider
+            values={budgetRange}
+            sliderLength={sliderLength} // Use responsive length
+            onValuesChange={setBudgetRange}
+            min={0}
+            max={2.1}
             step={0.1}
-            value={budget}
-            onValueChange={setBudget}
-            minimumTrackTintColor="#009CA0"
-            maximumTrackTintColor="#e5e7eb"
-            thumbTintColor="#009CA0"
+            allowOverlap={false}
+            snapped
+            trackStyle={styles.multiSliderTrack}
+            selectedStyle={styles.multiSliderSelectedTrack} // Teal between thumbs
+            unselectedStyle={styles.multiSliderUnselectedTrack} // Light gray outside thumbs
+            markerStyle={styles.multiSliderMarker} // White thumbs
           />
         </View>
 
@@ -267,26 +285,53 @@ const PropertySearchScreen = ({ navigation }) => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>No. of Rooms</Text>
           <View style={styles.roomTypeContainer}>
-            {['1RK', '1BHK', '2BHK', '3BHK', '4BHK', '+4BHK'].map((room) => (
-              <TouchableOpacity
-                key={room}
-                onPress={() => setSelectedRooms(room)}
-                style={[
-                  styles.roomButton,
-                  selectedRooms === room ? styles.roomButtonSelected : styles.roomButtonUnselected,
-                ]}
-              >
-                <Text
+            {/* First row: 1RK to 2BHK */}
+            <View style={styles.roomRow}>
+              {['1RK', '1BHK', '2BHK'].map((room) => (
+                <TouchableOpacity
+                  key={room}
+                  onPress={() => setSelectedRooms(room)}
                   style={[
-                    styles.roomButtonText,
-                    selectedRooms === room ? styles.roomButtonTextSelected : styles.roomButtonTextUnselected,
+                    styles.roomButton,
+                    selectedRooms === room ? styles.roomButtonSelected : styles.roomButtonUnselected,
                   ]}
                 >
-                  {room}
-                </Text>
-              </TouchableOpacity>
-            ))}
+                  <Text
+                    style={[
+                      styles.roomButtonText,
+                      selectedRooms === room ? styles.roomButtonTextSelected : styles.roomButtonTextUnselected,
+                    ]}
+                  >
+                    {room}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Second row: 3BHK to +4BHK */}
+            <View style={styles.roomRow}>
+              {['3BHK', '4BHK', '+4BHK'].map((room) => (
+                <TouchableOpacity
+                  key={room}
+                  onPress={() => setSelectedRooms(room)}
+                  style={[
+                    styles.roomButton,
+                    selectedRooms === room ? styles.roomButtonSelected : styles.roomButtonUnselected,
+                  ]}
+                >
+                  <Text
+                    style={[
+                      styles.roomButtonText,
+                      selectedRooms === room ? styles.roomButtonTextSelected : styles.roomButtonTextUnselected,
+                    ]}
+                  >
+                    {room}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
+
         </View>
 
         {/* Furnish Types Checkboxes */}
@@ -389,7 +434,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   scrollContent: { flex: 1, paddingHorizontal: 16, paddingTop: 16 },
-  section: { marginTop: 24 },
+  section: { marginTop: 2 },
   sectionTitle: { color: '#222222', fontSize: 16, marginBottom: 12, fontWeight: '800' },
   propertyTypeContainer: { flexDirection: 'row', justifyContent: 'space-around', marginHorizontal: -4 },
   propertyTypeButton: {
@@ -406,75 +451,133 @@ const styles = StyleSheet.create({
   propertyTypeButtonText: { fontSize: 14, marginTop: 8, fontWeight: '600' },
   propertyTypeButtonTextSelected: { color: '#ffffff' },
   propertyTypeButtonTextUnselected: { color: '#6b7280' },
-  sliderValue: { color: '#6b7280', fontSize: 14, marginBottom: 8, alignSelf: 'flex-end' }, // Align radius value to right
-  budgetSliderLabels: { // New style for budget slider labels
+
+  // Styles for the labels above the range sliders
+  sliderLabels: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 8,
   },
-  budgetSliderValueLeft: { color: '#6b7280', fontSize: 14 },
-  budgetSliderValueRight: { color: '#6b7280', fontSize: 14 },
-  checkboxOption: {
+  sliderValueLeft: { color: '#6b7280', fontSize: 14 },
+  sliderValueRight: { color: '#6b7280', fontSize: 14 },
+
+  // MultiSlider styles (applied to both Budget and Radius)
+  multiSliderTrack: {
+    height: 4, // Thickness of the track
+    borderRadius: 2, // Rounded corners
+  },
+  multiSliderSelectedTrack: {
+    backgroundColor: '#009CA0', // Teal for the selected range
+  },
+  multiSliderUnselectedTrack: {
+    backgroundColor: '#e5e7eb', // Light gray for the unselected range
+  },
+  multiSliderMarker: {
+    height: 24, // Size of the thumb (circle)
+    width: 24, // Size of the thumb (circle)
+    borderRadius: 12, // Make it a circle
+    backgroundColor: '#FFFFFF', // White thumb
+    borderWidth: 1, // Add border to match screenshot style
+    borderColor: '#d1d5db', // Light gray border
+    shadowColor: '#000', // Optional: for a subtle shadow
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.22,
+    shadowRadius: 2.22,
+    elevation: 3,
+  },
+
+     checkboxOption: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 12,
-    borderBottomWidth: 1, // Add subtle separator
-    borderBottomColor: '#f3f4f6', // Light gray separator
+    borderBottomWidth: 1,
+    borderBottomColor: '#e5e7eb',
   },
-  checkboxOptionContent: { flexDirection: 'row', alignItems: 'center' },
-  checkboxLabel: { color: '#374151', fontSize: 16, marginLeft: 12 },
+  checkboxOptionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  checkboxLabel: {
+    marginLeft: 12,
+    fontSize: 14,
+    color: '#374151',
+  },
   checkbox: {
     width: 20,
     height: 20,
-    borderWidth: 2,
     borderRadius: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  checkboxChecked: { backgroundColor: '#009CA0', borderColor: '#009CA0' },
-  checkboxUnchecked: { borderColor: '#d1d5db' },
-  iconImage: { width: 32, height: 32, resizeMode: 'contain', marginBottom: 4 }, // Increased size slightly for property type buttons
-  iconImageSmall: { width: 24, height: 24, resizeMode: 'contain' }, // Consistent with screenshot
-  searchButtonContainer: { paddingHorizontal: 16, paddingVertical: 16, borderTopWidth: 1, borderTopColor: '#f3f4f6' }, // Add a border top
-  searchButton: {
-    backgroundColor: '#009CA0',
-    paddingVertical: 16,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  searchButtonText: { color: '#ffffff', fontSize: 18, fontWeight: '500' },
-  // Styles for "No. of Rooms"
-  roomTypeContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap', // Allow wrapping to next line
-    justifyContent: 'flex-start', // Align to start
-    gap: 8, // Space between items
-  },
-  roomButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 6,
     borderWidth: 1,
     borderColor: '#d1d5db',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  roomButtonSelected: {
+  checkboxChecked: {
     backgroundColor: '#009CA0',
     borderColor: '#009CA0',
   },
+  checkboxUnchecked: {
+    backgroundColor: '#ffffff',
+  },
+  iconImage: {
+    width: 32,
+    height: 32,
+    resizeMode: 'contain',
+  },
+  iconImageSmall: {
+    width: 24,
+    height: 24,
+    resizeMode: 'contain',
+  },
+  roomTypeContainer: {
+    flexDirection: 'column',
+    gap: 8,
+  },
+  roomRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  roomButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginHorizontal: 4,
+  },
+  roomButtonSelected: {
+    backgroundColor: '#009CA0',
+  },
   roomButtonUnselected: {
     backgroundColor: '#f3f4f6',
-    borderColor: '#f3f4f6',
   },
   roomButtonText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   roomButtonTextSelected: {
     color: '#ffffff',
   },
   roomButtonTextUnselected: {
     color: '#6b7280',
+  },
+  searchButtonContainer: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#e5e7eb',
+    backgroundColor: '#ffffff',
+  },
+  searchButton: {
+    backgroundColor: '#009CA0',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  searchButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

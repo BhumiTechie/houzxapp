@@ -77,28 +77,36 @@ export default function HomeScreen({ navigation }) {
     </View>
   );
 
-  const renderNavItem = (label) => {
-    const isActive = activeTab === label;
-    return (
-      <TouchableOpacity
-        key={label}
-        style={styles.navItem}
-        onPress={() => setActiveTab(label)}
-      >
-        <Image
-          source={iconMap[label]}
-          style={[
-            styles.navIcon,
-            { tintColor: isActive ? '#009CA0' : '#666' },
-          ]}
-          resizeMode="contain"
-        />
-        <Text style={[styles.navText, { color: isActive ? '#009CA0' : '#666' }]}>
-          {label}
-        </Text>
-      </TouchableOpacity>
-    );
+const renderNavItem = (label) => {
+  const isActive = activeTab === label;
+
+  const handlePress = () => {
+    setActiveTab(label);
+
+    // ✅ Navigation for specific tabs
+    if (label === 'Account') {
+      navigation.navigate('AccountScreen');
+    } else if (label === 'Home') {
+      navigation.navigate('HomeScreen');
+    }
+    // agar Messages, Saved, Post Ad ko bhi screen deni hai
+    // to unke liye bhi yahan navigate() laga sakte ho
   };
+
+  return (
+    <TouchableOpacity key={label} style={styles.navItem} onPress={handlePress}>
+      <Image
+        source={iconMap[label]}
+        style={[styles.navIcon, { tintColor: isActive ? '#009CA0' : '#666' }]}
+        resizeMode="contain"
+      />
+      <Text style={[styles.navText, { color: isActive ? '#009CA0' : '#666' }]}>
+        {label}
+      </Text>
+    </TouchableOpacity>
+  );
+};
+
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -306,3 +314,4 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
 });
+ 
