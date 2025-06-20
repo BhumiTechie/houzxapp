@@ -1,29 +1,45 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  Platform,
-  StyleSheet,
-  Dimensions,
-  Alert,
+  View, Text, TextInput, TouchableOpacity, StyleSheet,
+  Dimensions, Alert, Platform
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useUser } from '../context/UserContext'; // ✅ import context
+import { useUser } from '../context/UserContext';
 
 const { width } = Dimensions.get('window');
 const maxWidth = 361;
 
 const LoginScreen = () => {
   const navigation = useNavigation();
-  const { setUser } = useUser(); // ✅ context hook
+  const { setUser } = useUser();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [secureText, setSecureText] = useState(true);
   const [rememberMe, setRememberMe] = useState(false);
+
+  // ✅ Auto Login
+  useEffect(() => {
+    const autoLogin = async () => {
+      const savedEmail = await AsyncStorage.getItem('userEmail');
+      const savedPassword = await AsyncStorage.getItem('userPassword');
+      const savedName = await AsyncStorage.getItem('userName');
+      const savedPhone = await AsyncStorage.getItem('userPhone');
+
+      if (savedEmail && savedPassword) {
+        setUser({
+          name: savedName || 'User',
+          email: savedEmail,
+          phone: savedPhone || '',
+          profilePic: `https://i.pravatar.cc/150?u=${savedEmail}`,
+        });
+        navigation.navigate('HomeScreen');
+      }
+    };
+    autoLogin();
+  }, []);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -34,15 +50,15 @@ const LoginScreen = () => {
     try {
       const savedEmail = await AsyncStorage.getItem('userEmail');
       const savedPassword = await AsyncStorage.getItem('userPassword');
+      const savedName = await AsyncStorage.getItem('userName');
       const savedPhone = await AsyncStorage.getItem('userPhone');
 
       if (
         email.trim().toLowerCase() === savedEmail?.toLowerCase() &&
         password === savedPassword
       ) {
-        // ✅ Set user in global context
         setUser({
-          name: 'User',
+          name: savedName || 'User',
           email: savedEmail,
           phone: savedPhone || '',
           profilePic: `https://i.pravatar.cc/150?u=${savedEmail}`,
@@ -61,7 +77,6 @@ const LoginScreen = () => {
 
   return (
     <View style={styles.screen}>
-      {/* 🔙 Top Nav Bar */}
       <View style={styles.topBar}>
         <Text style={styles.topBarTitle}>Log in</Text>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
@@ -69,9 +84,7 @@ const LoginScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {/* 🔒 Login Form */}
       <View style={styles.container}>
-        {/* Email */}
         <View style={styles.inputWrapper}>
           <Text style={styles.floatingLabel}>Email</Text>
           <TextInput
@@ -87,7 +100,6 @@ const LoginScreen = () => {
 
         <View style={{ margin: 20 }} />
 
-        {/* Password */}
         <View style={styles.inputWrapper}>
           <Text style={styles.floatingLabel}>Password</Text>
           <View style={styles.passwordInputContainer}>
@@ -110,18 +122,13 @@ const LoginScreen = () => {
           </View>
         </View>
 
-        <View style={{ height: 8 }} />
-
-        {/* Remember Me + Forgot Password */}
         <View style={styles.rememberForgotRow}>
           <TouchableOpacity
             style={styles.rememberMeWrapper}
             onPress={() => setRememberMe(!rememberMe)}
           >
             <View style={[styles.checkbox, rememberMe && styles.checkedBox]}>
-              {rememberMe && (
-                <Ionicons name="checkmark" size={14} color="#fff" />
-              )}
+              {rememberMe && <Ionicons name="checkmark" size={14} color="#fff" />}
             </View>
             <Text style={[styles.rememberMeText, rememberMe && { color: '#000' }]}>
               Remember Me
@@ -133,16 +140,10 @@ const LoginScreen = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={{ height: 8 }} />
-
-        {/* Log In Button */}
         <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           <Text style={styles.loginButtonText}>Log in</Text>
         </TouchableOpacity>
 
-        <View style={{ height: 8 }} />
-
-        {/* Sign Up Prompt */}
         <View style={styles.signupRow}>
           <Text style={styles.signupPrompt}>Don’t have an account? </Text>
           <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
@@ -226,6 +227,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginVertical: 16,
   },
   rememberMeWrapper: {
     flexDirection: 'row',
@@ -256,16 +258,12 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     width: '100%',
-    maxWidth: 361,
     height: 54,
     backgroundColor: '#009CA0',
     borderRadius: 8,
-    paddingHorizontal: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'center',
-    top: 26,
-    gap: 20,
+    marginTop: 12,
   },
   loginButtonText: {
     color: '#fff',
@@ -275,8 +273,7 @@ const styles = StyleSheet.create({
   signupRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
-    top: 32,
+    marginTop: 24,
   },
   signupPrompt: {
     fontSize: 14,

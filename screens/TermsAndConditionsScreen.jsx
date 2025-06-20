@@ -56,7 +56,7 @@ export default function TermsAndConditions({ navigation }) {
         <View style={styles.buttonWrapper}>
           <TouchableOpacity
             style={styles.agreeButton}
-            onPress={() => navigation.navigate('HomeScreen')}
+           onPress={() => navigation.navigate('ProfileScreen')}
           >
             <Text style={styles.agreeButtonText}>I Agree</Text>
           </TouchableOpacity>

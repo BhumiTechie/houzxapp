@@ -24,6 +24,7 @@ import NearestSchoolScreen from './screens/NearestSchoolScreen';
 import NearestCollegeScreen from './screens/NearestCollegeScreen';
 import NearestBusStopScreen from './screens/NearestBusStopScreen';
 import NearestAirportScreen from './screens/NearestAirportScreen';
+import BuyScreen from './screens/BuyScreen';
 
 import BillingPeriodScreen from './screens/BillingPeriodScreen';
 import RentConfirmationScreen from './screens/RentConfirmationScreen';
@@ -38,6 +39,9 @@ import AmenitiesFilterScreen from './screens/AmenitiesFilterScreen';
 import SuitableForFilterScreen from './screens/SuitableForFilterScreen';
 import SortByModal from './screens/SortByModal';
 import AccountScreen from './screens/AccountScreen';
+import PersonalDetailsScreen from './screens/PersonalDetailsScreen';
+import ProfileScreen from './screens/ProfileScreen';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -89,6 +93,7 @@ export default function App() {
           <Stack.Screen name="OTPScreen" component={OTPScreen} />
           <Stack.Screen name="Login" component={LoginScreen} />
           <Stack.Screen name="HomeScreen" component={HomeScreen} />
+          <Stack.Screen name="BuyScreen" component={BuyScreen} />
           <Stack.Screen name="PropertySearchScreen" component={PropertySearchScreen} />
           <Stack.Screen name="PropertyDetailsScreen" component={PropertyDetailsScreen} />
           <Stack.Screen name="AdvertiserProfileScreen" component={AdvertiserProfileScreen} />
@@ -108,6 +113,8 @@ export default function App() {
           <Stack.Screen name="ResetPasswordScreen" component={ResetPasswordScreen} />
           <Stack.Screen name="SearchScreen" component={SearchScreen} />
           <Stack.Screen name="PropertyApp" component={PropertyApp} />
+           <Stack.Screen name="PersonalDetails" component={PersonalDetailsScreen} />
+             <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
      
 
 

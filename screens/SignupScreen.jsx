@@ -409,7 +409,7 @@ buttonText: {
     fontFamily: 'SF Pro Text', // SF Pro Text font-family
     fontWeight: 'bold',
     fontSize: 16,
-    lineHeight: 16,
+    lineHeight: 16 ,
     letterSpacing: -0.5,
     textAlign: 'center',
     color: '#000',  // Black color for "Log in." part

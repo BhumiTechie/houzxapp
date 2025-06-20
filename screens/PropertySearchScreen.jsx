@@ -581,4 +581,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PropertySearchScreen;
+export default PropertySearchScreen; 
