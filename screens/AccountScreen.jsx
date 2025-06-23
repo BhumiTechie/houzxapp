@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -12,7 +13,7 @@ import {
 import { useUser } from '../context/UserContext';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native'; // ✅ added navigation
+import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 const baseWidth = 414;
@@ -22,9 +23,19 @@ const responsiveSize = (size) => Math.round(size * scale);
 export default function AccountScreen() {
   const { user } = useUser();
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation(); // ✅ initialized navigation
+  const navigation = useNavigation();
 
   const headerPaddingTop = Platform.OS === 'android' ? StatusBar.currentHeight + 20 : 50;
+
+  // Debugging: Log user object whenever it changes
+  useEffect(() => {
+    console.log('AccountScreen: Current user data from context:', user);
+    if (user && user.email) {
+      console.log('AccountScreen: Email is present in user context:', user.email);
+    } else {
+      console.log('AccountScreen: Email is NOT present or user is null/undefined.');
+    }
+  }, [user]);
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f0f2f5' }}>
@@ -32,7 +43,7 @@ export default function AccountScreen() {
         style={styles.container}
         contentContainerStyle={{ paddingBottom: insets.bottom + responsiveSize(20) }}
       >
-        {/* ✅ Header */}
+        {/* Header */}
         <View style={[styles.header, { paddingTop: headerPaddingTop }]}>
           <Text style={styles.title}>Account</Text>
         </View>
@@ -42,9 +53,11 @@ export default function AccountScreen() {
           <View style={styles.profileInfo}>
             <View style={styles.profileTextContainer}>
               <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
+                {/* Displays the full name from ProfileScreen */}
                 {user?.name || 'Your Name'}
               </Text>
               <Text style={styles.email} numberOfLines={1} ellipsizeMode="tail">
+                {/* Displays the email from SignupScreen */}
                 {user?.email || 'your@email.com'}
               </Text>
             </View>
@@ -71,7 +84,6 @@ export default function AccountScreen() {
             <Text style={styles.sectionTitle}>PROFILE</Text>
           </View>
 
-          {/* ✅ Personal Details Navigation */}
           <TouchableOpacity
             style={styles.profileRow}
             onPress={() => navigation.navigate('PersonalDetails')}
@@ -87,7 +99,6 @@ export default function AccountScreen() {
             <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
           </TouchableOpacity>
 
-          {/* My Ads */}
           <TouchableOpacity style={styles.profileRow}>
             <View style={styles.rowLeft}>
               <Image

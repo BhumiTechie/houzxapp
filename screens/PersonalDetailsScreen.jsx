@@ -1,5 +1,14 @@
 import { useState, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform, StatusBar, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  StatusBar,
+  Alert,
+} from 'react-native';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from '../context/UserContext';
@@ -25,21 +34,22 @@ export default function PersonalDetailsScreen() {
             setPhone(parsed.phone || '');
           }
         } catch (e) {
-          console.log('Error loading user data on focus:', e);
+          console.log('Error loading user data:', e);
         }
       };
-
       loadUserData();
     }, [])
   );
 
   const handleSave = async () => {
+    const fullName = `${firstName} ${lastName}`.trim();
+
     const updatedUser = {
       ...user,
       firstName,
       lastName,
       phone,
-      name: `${firstName} ${lastName}`,
+      name: fullName,
     };
 
     try {
@@ -69,7 +79,12 @@ export default function PersonalDetailsScreen() {
         <TextInput value={lastName} onChangeText={setLastName} style={styles.input} />
 
         <Text style={styles.label}>Phone</Text>
-        <TextInput value={phone} onChangeText={setPhone} style={styles.input} keyboardType="phone-pad" />
+        <TextInput
+          value={phone}
+          onChangeText={setPhone}
+          style={styles.input}
+          keyboardType="phone-pad"
+        />
       </View>
 
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>

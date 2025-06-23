@@ -17,13 +17,12 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from '../context/UserContext';
 
-const { width, height } = Dimensions.get('window'); // Getting screen dimensions
+const { width, height } = Dimensions.get('window');
 
 export default function SignupScreen({ navigation }) {
   const [secureText, setSecureText] = useState(true);
   const [secureConfirm, setSecureConfirm] = useState(true);
-  const { setUser } = useUser(); // 👈 Add this just below useState
-
+  const { setUser } = useUser();
 
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -32,109 +31,68 @@ export default function SignupScreen({ navigation }) {
 
   const isPasswordMatch = password === confirmPassword;
 
-  // const handleSignup = async () => {
-  //   if (!email || !phone || !password || !confirmPassword) {
-  //     Alert.alert('Error', 'Please fill all the fields');
-  //     return;
-  //   }
+  const handleSignup = async () => {
+    if (!email || !phone || !password || !confirmPassword) {
+      Alert.alert('Error', 'Please fill all the fields');
+      return;
+    }
 
-  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  //   if (!emailRegex.test(email)) {
-  //     Alert.alert('Error', 'Invalid email address');
-  //     return;
-  //   }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      Alert.alert('Error', 'Invalid email address');
+      return;
+    }
 
-  //   if (!isPasswordMatch) {
-  //     Alert.alert('Error', 'Passwords do not match');
-  //     return;
-  //   }
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
+      return;
+    }
 
-  //   if (
-  //     password.length < 10 ||
-  //     !/[A-Z]/.test(password) ||
-  //     !/[a-z]/.test(password) ||
-  //     !/[0-9]/.test(password) ||
-  //     !/[!@#$%^&*]/.test(password)
-  //   ) {
-  //     Alert.alert(
-  //       'Weak Password',
-  //       'Password must be at least 10 characters and include uppercase, lowercase, number, and symbol.'
-  //     );
-  //     return;
-  //   }
+    if (
+      password.length < 10 ||
+      !/[A-Z]/.test(password) ||
+      !/[a-z]/.test(password) ||
+      !/[0-9]/.test(password) ||
+      !/[!@#$%^&*]/.test(password)
+    ) {
+      Alert.alert(
+        'Weak Password',
+        'Password must be at least 10 characters and include uppercase, lowercase, number, and symbol.'
+      );
+      return;
+    }
 
-  //   // Saving email and password to AsyncStorage
-  //   await AsyncStorage.setItem('userEmail', email);
-  //   await AsyncStorage.setItem('userPassword', password);
-
-  //   // ✅ All good
-  //   navigation.navigate('TermsAndConditions');
-  // };
-const handleSignup = async () => {
-  if (!email || !phone || !password || !confirmPassword) {
-    Alert.alert('Error', 'Please fill all the fields');
-    return;
-  }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    Alert.alert('Error', 'Invalid email address');
-    return;
-  }
-
-  if (!isPasswordMatch) {
-    Alert.alert('Error', 'Passwords do not match');
-    return;
-  }
-
-  if (
-    password.length < 10 ||
-    !/[A-Z]/.test(password) ||
-    !/[a-z]/.test(password) ||
-    !/[0-9]/.test(password) ||
-    !/[!@#$%^&*]/.test(password)
-  ) {
-    Alert.alert(
-      'Weak Password',
-      'Password must be at least 10 characters and include uppercase, lowercase, number, and symbol.'
-    );
-    return;
-  }
-
-  try {
-    await AsyncStorage.setItem('userEmail', email.trim().toLowerCase());
-    await AsyncStorage.setItem('userPassword', password.trim());
-
-    // ✅ Save user data in global context
-    setUser({
-      name: 'User', // Optional: add name field if you collect it later
+    // This userData contains email and phone
+    const userData = {
       email: email.trim().toLowerCase(),
       phone: phone.trim(),
-      profilePic: 'https://i.pravatar.cc/150?u=' + email, // auto avatar
-    });
+      profilePic: 'https://i.pravatar.cc/150?u=' + email, // Using email for a unique avatar
+      // 'name', 'firstName', 'lastName' will be added by ProfileScreen
+    };
 
-    Alert.alert('Success', 'Account created successfully');
-    navigation.navigate('TermsAndConditions');
-  } catch (error) {
-    console.log('Error saving user data:', error);
-    Alert.alert('Error', 'Failed to create account');
-  }
-};
+    try {
+      await AsyncStorage.setItem('userData', JSON.stringify(userData));
+      setUser(userData); // Update context
+      console.log('SignupScreen: Data saved to AsyncStorage:', JSON.stringify(userData)); // Debug
+      navigation.navigate('TermsAndConditions'); // or your next screen
+    } catch (error) {
+      Alert.alert('Error', 'Failed to sign up. Please try again.');
+      console.error('SignupScreen Error:', error);
+    }
+  };
 
- 
-
-  const gap = width * 0.05; // Dynamic gap (5% of screen width)
+  const gap = width * 0.05;
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar backgroundColor="#05141A" barStyle="light-content" />
 
-      {/* Top Bar */} 
+      {/* Top Bar */}
       <View style={styles.topBar}>
         <TouchableOpacity
           onPress={() => {
             if (navigation.canGoBack()) {
-              navigation.goBack(); 
+              navigation.goBack();
             } else {
               navigation.navigate('Welcome');
             }
@@ -201,8 +159,8 @@ const handleSignup = async () => {
 
         {/* Password Info */}
         <Text style={styles.passwordInfo}>
-          Your password must be minimum 10 characters long.{"\n"}
-          Contain at least 1 number, 1 symbol, Uppercase and {"\n"}lower case.
+          Your password must be minimum 10 characters long.{'\n'}
+          Contain at least 1 number, 1 symbol, Uppercase and {'\n'}lower case.
         </Text>
 
         {/* Confirm Password */}
@@ -257,21 +215,18 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-
   topBar: {
     backgroundColor: '#05141A',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0, // Adjusted padding for Android/iOS
-    paddingHorizontal: width * 0.05,  // Adjusted for responsiveness
+    paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 0,
+    paddingHorizontal: width * 0.05,
     height: 50,
   },
-
   backIconWrapper: {
-    zIndex: 2
+    zIndex: 2,
   },
-
   backIcon: {
     width: 24,
     height: 24,
@@ -281,7 +236,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
   },
-
   centerTitleWrapper: {
     position: 'absolute',
     left: 0,
@@ -289,21 +243,18 @@ const styles = StyleSheet.create({
     top: 10,
     alignItems: 'center',
   },
-
   topBarTitle: {
     color: '#fff',
-    fontSize: width * 0.05, // Adjusts dynamically
+    fontSize: width * 0.05,
     fontWeight: '600',
   },
-
   scroll: {
-    paddingHorizontal: width * 0.05, // Adjusted for responsiveness
+    paddingHorizontal: width * 0.05,
     paddingTop: 10,
   },
-
   inputWrapper: {
-    width: width * 0.9,  // 90% of screen width for responsiveness
-    height: 54,  // Fixed height of 54px
+    width: width * 0.9,
+    height: 54,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#B0B0B0',
@@ -312,7 +263,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     backgroundColor: '#fff',
   },
-
   floatingLabel: {
     position: 'absolute',
     top: -10,
@@ -323,7 +273,6 @@ const styles = StyleSheet.create({
     color: '#333',
     zIndex: 1,
   },
-
   floatingInput: {
     fontSize: 16,
     fontWeight: '400',
@@ -334,7 +283,6 @@ const styles = StyleSheet.create({
     paddingTop: 14,
     textAlignVertical: 'center',
   },
-
   passwordInput: {
     flex: 1,
     fontSize: 16,
@@ -346,73 +294,58 @@ const styles = StyleSheet.create({
     paddingTop: 18,
     textAlignVertical: 'center',
   },
-
   inputWithIcon: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-
-passwordInfo: {
-  width: '100%',
-  fontSize: 13,
-  lineHeight: 14,
-  color: '#717171',
-  marginTop: 8,
-  marginLeft: 4,       // Thoda left alignment ke liye
-  marginBottom: 6,     // Neeche ke gap ke liye
-  textAlign: 'left',
-},
-
-
-button: {
-width: Math.min(width * 0.9, 361),
-  height: 54,
-  paddingTop: 17,
-  paddingBottom: 17,
-  paddingLeft: 10,
-  paddingRight: 10,
-  justifyContent: 'center',
-  alignItems: 'center',
-  borderRadius: 8, // Spacing/2
-  backgroundColor: '#009CA0',
-  alignSelf: 'center',
-  marginTop: 50,
-},
-
-buttonText: {
-  fontWeight: '500',
-  fontSize: 16,
-  lineHeight: 20,
-  letterSpacing: -0.5,
-  textAlign: 'center',
-  color: '#FFFFFF',
-},
-
-
+  passwordInfo: {
+    width: '100%',
+    fontSize: 13,
+    lineHeight: 14,
+    color: '#717171',
+    marginTop: 8,
+    marginLeft: 4,
+    marginBottom: 6,
+    textAlign: 'left',
+  },
+  button: {
+    width: Math.min(width * 0.9, 361),
+    height: 54,
+    paddingTop: 17,
+    paddingBottom: 17,
+    paddingLeft: 10,
+    paddingRight: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+    backgroundColor: '#009CA0',
+    alignSelf: 'center',
+    marginTop: 50,
+  },
+  buttonText: {
+    fontWeight: '500',
+    fontSize: 16,
+    lineHeight: 20,
+    letterSpacing: -0.5,
+    textAlign: 'center',
+    color: '#FFFFFF',
+  },
   footerText: {
-    fontFamily: 'SF Pro Text', // SF Pro Text font-family
     fontWeight: '500',
     fontSize: 16,
     lineHeight: 16,
     letterSpacing: -0.5,
     textAlign: 'center',
-    color: '#717171',  // Lighter grey color for the "Already have an account?" part
+    color: '#717171',
     marginTop: 20,
   },
-
-  alreadyText: {
-    color: '#717171',  // Grey color for the "Already have an account?" part
-  },
-
   loginText: {
-    fontFamily: 'SF Pro Text', // SF Pro Text font-family
     fontWeight: 'bold',
     fontSize: 16,
-    lineHeight: 16 ,
+    lineHeight: 16,
     letterSpacing: -0.5,
     textAlign: 'center',
-    color: '#000',  // Black color for "Log in." part
+    color: '#000',
   },
-
 });

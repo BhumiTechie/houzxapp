@@ -43,6 +43,7 @@ import PersonalDetailsScreen from './screens/PersonalDetailsScreen';
 import ProfileScreen from './screens/ProfileScreen';
 
 
+
 const Stack = createNativeStackNavigator();
 
 export default function App() {
