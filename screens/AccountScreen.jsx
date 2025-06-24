@@ -27,7 +27,6 @@ export default function AccountScreen() {
 
   const headerPaddingTop = Platform.OS === 'android' ? StatusBar.currentHeight + 20 : 50;
 
-  // Debugging: Log user object whenever it changes
   useEffect(() => {
     console.log('AccountScreen: Current user data from context:', user);
     if (user && user.email) {
@@ -53,24 +52,24 @@ export default function AccountScreen() {
           <View style={styles.profileInfo}>
             <View style={styles.profileTextContainer}>
               <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
-                {/* Displays the full name from ProfileScreen */}
                 {user?.name || 'Your Name'}
               </Text>
               <Text style={styles.email} numberOfLines={1} ellipsizeMode="tail">
-                {/* Displays the email from SignupScreen */}
                 {user?.email || 'your@email.com'}
               </Text>
             </View>
             <TouchableOpacity style={styles.avatarWrapper}>
-              <Image
-                source={{
-                  uri:
-                    user?.profilePic ||
-                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSteItzPyeDKBxyWiOA8xrPZXIlxOYv1b1VVg&s',
-                }}
-                style={styles.avatar}
-                resizeMode="cover"
-              />
+      <Image
+  source={{
+    uri: user?.profileImage || 'https://via.placeholder.com/64',
+  }}
+  onError={(e) => {
+    console.warn('Avatar image failed to load', e.nativeEvent.error);
+  }}
+  style={styles.avatar}
+  resizeMode="cover"
+/>
+
               <View style={styles.cameraIcon}>
                 <Feather name="camera" size={20} color="#fff" />
               </View>
@@ -182,7 +181,7 @@ export default function AccountScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Share and Sign Out */}
+        {/* Bottom Section */}
         <View style={styles.bottomSection}>
           <View style={styles.doubleActionRow}>
             <TouchableOpacity style={styles.actionBox}>

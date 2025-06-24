@@ -7,7 +7,9 @@ import {
   StyleSheet,
   SafeAreaView,
   Alert,
+  Image,
 } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useUser } from '../context/UserContext';
@@ -15,9 +17,9 @@ import { useUser } from '../context/UserContext';
 export default function ProfileScreen({ navigation }) {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const { setUser } = useUser(); // We only need setUser here to update the context
+  const [profileImage, setProfileImage] = useState(null);
+  const { setUser } = useUser();
 
-  // Load existing profile data (firstName, lastName) if available when component mounts
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -26,7 +28,8 @@ export default function ProfileScreen({ navigation }) {
           const parsed = JSON.parse(saved);
           setFirstName(parsed.firstName || '');
           setLastName(parsed.lastName || '');
-          console.log('ProfileScreen: Pre-filled with existing name data:', parsed); // Debug log
+          setProfileImage(parsed.profileImage || null);
+          console.log('ProfileScreen: Pre-filled with existing name data:', parsed);
         }
       } catch (e) {
         console.log('Error loading profile data for pre-fill:', e);
@@ -34,6 +37,25 @@ export default function ProfileScreen({ navigation }) {
     };
     loadData();
   }, []);
+
+  const handleImagePick = async () => {
+    const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permission.granted) {
+      Alert.alert('Permission Denied', 'Please allow access to photos to upload a profile picture.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+
+    if (!result.canceled && result.assets?.length > 0) {
+      setProfileImage(result.assets[0].uri);
+    }
+  };
 
   const handleContinue = async () => {
     const fullName = `${firstName} ${lastName}`.trim();
@@ -43,34 +65,32 @@ export default function ProfileScreen({ navigation }) {
       return;
     }
 
-    // --- CRUCIAL FIX: Load existing user data first ---
     let existingUserData = {};
     try {
       const saved = await AsyncStorage.getItem('userData');
       if (saved) {
         existingUserData = JSON.parse(saved);
-        console.log('ProfileScreen: Existing user data loaded BEFORE MERGE:', existingUserData); // Debug
+        console.log('ProfileScreen: Existing user data loaded BEFORE MERGE:', existingUserData);
       } else {
-        console.log('ProfileScreen: No existing user data found, starting name fresh.'); // Debug
+        console.log('ProfileScreen: No existing user data found, starting name fresh.');
       }
     } catch (e) {
       console.error('Error loading existing user data in ProfileScreen for merge:', e);
     }
 
-    // Create the updated user data object by merging existing data with new name
     const updatedUserData = {
-      ...existingUserData, // <-- THIS IS THE KEY: Spreads (copies) existing properties (like email, phone)
-      firstName,           // <-- These add/overwrite new properties
+      ...existingUserData,
+      firstName,
       lastName,
-      name: fullName,      // <-- This is the full name to display on AccountScreen
+      name: fullName,
+      profileImage,
     };
 
     try {
       await AsyncStorage.setItem('userData', JSON.stringify(updatedUserData));
-      setUser(updatedUserData); // Update the UserContext with the merged data
-
-      console.log('ProfileScreen: User data SAVED AFTER MERGE:', updatedUserData); // Debug
-      navigation.navigate('HomeScreen'); // Navigate to your main app screen
+      setUser(updatedUserData);
+      console.log('ProfileScreen: User data SAVED AFTER MERGE:', updatedUserData);
+      navigation.navigate('HomeScreen');
     } catch (error) {
       Alert.alert('Error', 'Failed to save profile. Please try again.');
       console.error('Error saving userData in ProfileScreen:', error);
@@ -86,9 +106,19 @@ export default function ProfileScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.imagePlaceholder}>
-        <Text style={styles.imagePlaceholderText}>Upload Photo</Text>
-      </View>
+      <TouchableOpacity style={styles.imagePlaceholder} onPress={handleImagePick}>
+        {profileImage ? (
+          <>
+            <Image source={{ uri: profileImage }} style={styles.avatar} />
+            <View style={styles.overlay}>
+              <Text style={styles.overlayText}>Change</Text>
+            </View>
+            <Ionicons name="camera" size={20} color="#fff" style={styles.cameraIcon} />
+          </>
+        ) : (
+          <Text style={styles.imagePlaceholderText}>Upload Photo</Text>
+        )}
+      </TouchableOpacity>
 
       <TextInput
         style={styles.input}
@@ -147,10 +177,36 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: 32,
+    overflow: 'hidden',
   },
   imagePlaceholderText: {
     fontSize: 12,
     color: '#666',
+  },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+  },
+  overlay: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingVertical: 4,
+    alignItems: 'center',
+  },
+  overlayText: {
+    color: '#fff',
+    fontSize: 12,
+  },
+  cameraIcon: {
+    position: 'absolute',
+    bottom: 4,
+    right: 4,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    padding: 4,
+    borderRadius: 12,
   },
   input: {
     height: 50,
