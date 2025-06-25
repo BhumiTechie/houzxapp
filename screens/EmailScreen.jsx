@@ -7,6 +7,7 @@ import {
   StyleSheet,
   SafeAreaView,
   Alert,
+  Dimensions,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
@@ -15,7 +16,9 @@ import { useUser } from '../context/UserContext'; // Importing user context
 export default function EmailScreen() {
   const navigation = useNavigation();
   const [newEmail, setNewEmail] = useState('');
-  const { user, updateUser } = useUser(); // Accessing current user and update method
+  const { user, updateUser } = useUser();
+  const { width } = Dimensions.get('window');
+  const gap = 30; // define a margin gap for spacing
 
   const handleSave = () => {
     if (!newEmail || !newEmail.includes('@')) {
@@ -23,10 +26,10 @@ export default function EmailScreen() {
       return;
     }
 
-    // Simulate update
+    // Update user email
     updateUser({ ...user, email: newEmail });
     Alert.alert('Success', 'Your email has been updated.');
-    navigation.goBack(); // Go back to previous screen
+    navigation.goBack();
   };
 
   return (
@@ -49,15 +52,19 @@ export default function EmailScreen() {
         <Text style={styles.label}>Current Email</Text>
         <Text style={styles.currentEmail}>{user?.email || 'Not Available'}</Text>
 
-        <Text style={styles.label}>New Email</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Enter new email"
-          value={newEmail}
-          onChangeText={setNewEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
+        {/* Email Input */}
+        <View style={[styles.inputWrapper, { width: width - 40, marginTop: gap }]}>
+          <Text style={styles.floatingLabel}>New Email</Text>
+          <TextInput
+            style={styles.floatingInput}
+            placeholder="Enter new email"
+            placeholderTextColor="#B0B0B0"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={newEmail}
+            onChangeText={setNewEmail}
+          />
+        </View>
 
         {/* Save Button */}
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
@@ -91,36 +98,60 @@ const styles = StyleSheet.create({
   },
   infoText: {
     fontSize: 14,
-    color: '#333',
+    color: '#5E5E5E',
     marginBottom: 20,
   },
   label: {
     fontSize: 14,
-    color: '#666',
+    color: '#5E5E5E',
     marginTop: 12,
   },
   currentEmail: {
     fontSize: 15,
     fontWeight: '500',
     marginTop: 4,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 8,
+    color:'#222222'
   },
   saveButton: {
     backgroundColor: '#009CA0',
     padding: 14,
     borderRadius: 8,
-    marginTop: 24,
+    marginTop: 28,
     alignItems: 'center',
   },
   saveButtonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  inputWrapper: {
+    height: 54,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#B0B0B0',
+    marginTop: 28,
+    marginBottom: 20,
+    paddingHorizontal: 12,
+    backgroundColor: '#fff',
+  },
+  floatingLabel: {
+    position: 'absolute',
+    top: -10,
+    left: 14,
+    backgroundColor: '#fff',
+    paddingHorizontal: 4,
+    fontSize: 13,
+    color: '#333',
+    zIndex: 1,
+  },
+  floatingInput: {
+    fontSize: 16,
+    fontWeight: '400',
+    letterSpacing: -0.5,
+    lineHeight: 19,
+    color: '#000',
+    height: 50,
+    paddingTop: 14,
+    textAlignVertical: 'center',
   },
 });
