@@ -9,11 +9,13 @@ import {
   Dimensions,
   Platform,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { useUser } from '../context/UserContext';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
+import * as ImagePicker from 'expo-image-picker';
 
 const { width } = Dimensions.get('window');
 const baseWidth = 414;
@@ -21,7 +23,7 @@ const scale = width / baseWidth;
 const responsiveSize = (size) => Math.round(size * scale);
 
 export default function AccountScreen() {
-  const { user } = useUser();
+  const { user, updateUser } = useUser(); // Make sure updateUser is available in your context
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
 
@@ -29,12 +31,35 @@ export default function AccountScreen() {
 
   useEffect(() => {
     console.log('AccountScreen: Current user data from context:', user);
-    if (user && user.email) {
-      console.log('AccountScreen: Email is present in user context:', user.email);
-    } else {
-      console.log('AccountScreen: Email is NOT present or user is null/undefined.');
-    }
   }, [user]);
+
+  const pickImage = async () => {
+    try {
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        Alert.alert('Permission required', 'Please allow access to your media library to change profile picture.');
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.7,
+      });
+
+      if (!result.canceled) {
+        const selectedImage = result.assets[0].uri;
+        console.log('Selected image URI:', selectedImage);
+
+        if (updateUser) {
+          updateUser({ ...user, profileImage: selectedImage });
+        }
+      }
+    } catch (error) {
+      console.log('Error selecting image:', error);
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f0f2f5' }}>
@@ -58,18 +83,17 @@ export default function AccountScreen() {
                 {user?.email || 'your@email.com'}
               </Text>
             </View>
-            <TouchableOpacity style={styles.avatarWrapper}>
-      <Image
-  source={{
-    uri: user?.profileImage || 'https://via.placeholder.com/64',
-  }}
-  onError={(e) => {
-    console.warn('Avatar image failed to load', e.nativeEvent.error);
-  }}
-  style={styles.avatar}
-  resizeMode="cover"
-/>
-
+            <TouchableOpacity style={styles.avatarWrapper} onPress={pickImage}>
+              <Image
+                source={{
+                  uri: user?.profileImage || 'https://via.placeholder.com/64',
+                }}
+                onError={(e) => {
+                  console.warn('Avatar image failed to load', e.nativeEvent.error);
+                }}
+                style={styles.avatar}
+                resizeMode="cover"
+              />
               <View style={styles.cameraIcon}>
                 <Feather name="camera" size={20} color="#fff" />
               </View>
@@ -88,23 +112,17 @@ export default function AccountScreen() {
             onPress={() => navigation.navigate('PersonalDetails')}
           >
             <View style={styles.rowLeft}>
-              <Image
-                source={require('../assets/personal.png')}
-                style={styles.iconImage}
-                resizeMode="contain"
-              />
+              <Image source={require('../assets/personal.png')} style={styles.iconImage} />
               <Text style={styles.profileText}>Personal Details</Text>
             </View>
             <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
           </TouchableOpacity>
-
-          <TouchableOpacity style={styles.profileRow}>
+<TouchableOpacity
+  style={styles.profileRow}
+  onPress={() => navigation.navigate('MyAds')} // ✅ ADD THIS
+>
             <View style={styles.rowLeft}>
-              <Image
-                source={require('../assets/myads.png')}
-                style={styles.iconImage}
-                resizeMode="contain"
-              />
+              <Image source={require('../assets/myads.png')} style={styles.iconImage} />
               <Text style={styles.profileText}>My Ads</Text>
             </View>
             <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
@@ -115,25 +133,32 @@ export default function AccountScreen() {
         <View style={styles.Accountsection}>
           <Text style={styles.accountSectionTitle}>ACCOUNT SETTINGS</Text>
 
-          <TouchableOpacity style={styles.row}>
-            <View style={styles.rowLeft}>
-              <Image
-                source={require('../assets/emailchange.png')}
-                style={styles.iconImage}
-                resizeMode="contain"
-              />
-              <Text style={styles.label}>Change Email</Text>
-            </View>
-            <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
-          </TouchableOpacity>
+     <TouchableOpacity
+  style={styles.row}
+  onPress={() => navigation.navigate('ChangeEmail')} // 👈 Add this line
+>
+  <View style={styles.rowLeft}>
+    <Image source={require('../assets/emailchange.png')} style={styles.iconImage} />
+    <Text style={styles.label}>Change Email</Text>
+  </View>
+  <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
+</TouchableOpacity>
+
+<TouchableOpacity
+  style={styles.row}
+  onPress={() => navigation.navigate('ChangePassword')} // 👈 Add this line
+>
+  <View style={styles.rowLeft}>
+    <Image source={require('../assets/changepass.png')} style={styles.iconImage} />
+    <Text style={styles.label}>Change Password</Text>
+  </View>
+  <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
+</TouchableOpacity>
+
 
           <TouchableOpacity style={styles.row}>
             <View style={styles.rowLeft}>
-              <Image
-                source={require('../assets/changepass.png')}
-                style={styles.iconImage}
-                resizeMode="contain"
-              />
+              <Image source={require('../assets/changepass.png')} style={styles.iconImage} />
               <Text style={styles.label}>Change Password</Text>
             </View>
             <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
@@ -141,11 +166,7 @@ export default function AccountScreen() {
 
           <TouchableOpacity style={styles.row}>
             <View style={styles.rowLeft}>
-              <Image
-                source={require('../assets/delete.png')}
-                style={styles.iconImage}
-                resizeMode="contain"
-              />
+              <Image source={require('../assets/delete.png')} style={styles.iconImage} />
               <Text style={styles.label}>Delete Account</Text>
             </View>
             <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
@@ -158,11 +179,7 @@ export default function AccountScreen() {
 
           <TouchableOpacity style={styles.row}>
             <View style={styles.rowLeft}>
-              <Image
-                source={require('../assets/terms.png')}
-                style={styles.iconImage}
-                resizeMode="contain"
-              />
+              <Image source={require('../assets/terms.png')} style={styles.iconImage} />
               <Text style={styles.label}>Terms & Conditions</Text>
             </View>
             <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
@@ -170,11 +187,7 @@ export default function AccountScreen() {
 
           <TouchableOpacity style={styles.row}>
             <View style={styles.rowLeft}>
-              <Image
-                source={require('../assets/privacy.png')}
-                style={styles.iconImage}
-                resizeMode="contain"
-              />
+              <Image source={require('../assets/privacy.png')} style={styles.iconImage} />
               <Text style={styles.label}>Privacy Policy</Text>
             </View>
             <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
@@ -200,6 +213,7 @@ export default function AccountScreen() {
   );
 }
 
+// Styles (same as your original code)
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { UserProvider } from './context/UserContext'; // ✅ Context import
-// import MainTabs from './MainTabs';
+
 
 
 // Screens
@@ -41,6 +41,11 @@ import SortByModal from './screens/SortByModal';
 import AccountScreen from './screens/AccountScreen';
 import PersonalDetailsScreen from './screens/PersonalDetailsScreen';
 import ProfileScreen from './screens/ProfileScreen';
+import MyAdsScreen from './screens/MyAdsScreen';
+import EditAdScreen from './screens/EditAdScreen';
+import { AdProvider } from './context/AdContext';
+import EmailScreen from './screens/EmailScreen';
+
 
 
 
@@ -76,6 +81,7 @@ export default function App() {
 
   return (
     <UserProvider> {/* ✅ WRAPPED HERE */}
+    <AdProvider>
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="Splash"
@@ -116,6 +122,9 @@ export default function App() {
           <Stack.Screen name="PropertyApp" component={PropertyApp} />
            <Stack.Screen name="PersonalDetails" component={PersonalDetailsScreen} />
              <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+             <Stack.Screen name="MyAds" component={MyAdsScreen} />
+             <Stack.Screen name="EditAd" component={EditAdScreen} />
+           <Stack.Screen name="ChangeEmail" component={EmailScreen} />
      
 
 
@@ -141,12 +150,14 @@ export default function App() {
               />
             )}
           </Stack.Screen>
+       
 
           <Stack.Screen name="RentConfirmation">
             {(props) => <RentConfirmationScreen {...props} rentDetails={rentDetails} />}
           </Stack.Screen>
         </Stack.Navigator>
       </NavigationContainer>
+      </AdProvider>
     </UserProvider>
   );
 }
