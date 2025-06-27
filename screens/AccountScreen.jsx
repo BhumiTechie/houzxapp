@@ -164,13 +164,17 @@ export default function AccountScreen() {
             <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.row}>
-            <View style={styles.rowLeft}>
-              <Image source={require('../assets/delete.png')} style={styles.iconImage} />
-              <Text style={styles.label}>Delete Account</Text>
-            </View>
-            <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
-          </TouchableOpacity>
+       <TouchableOpacity
+  style={styles.row}
+  onPress={() => navigation.navigate('ConfirmDelete')}
+>
+  <View style={styles.rowLeft}>
+    <Image source={require('../assets/delete.png')} style={styles.iconImage} />
+    <Text style={styles.label}>Delete Account</Text>
+  </View>
+  <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
+</TouchableOpacity>
+
         </View>
 
         {/* Legal */}

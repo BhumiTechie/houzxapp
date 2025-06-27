@@ -45,10 +45,14 @@ import MyAdsScreen from './screens/MyAdsScreen';
 import EditAdScreen from './screens/EditAdScreen';
 import { AdProvider } from './context/AdContext';
 import EmailScreen from './screens/EmailScreen';
+import VerifyOtpScreen from './screens/VerifyOtpScreen';
+import ConfirmDeleteScreen from './screens/ConfirmDeleteScreen';
 
 
 
 
+
+ 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -125,7 +129,12 @@ export default function App() {
              <Stack.Screen name="MyAds" component={MyAdsScreen} />
              <Stack.Screen name="EditAd" component={EditAdScreen} />
            <Stack.Screen name="ChangeEmail" component={EmailScreen} />
-     
+           <Stack.Screen name="VerifyOtpScreen" component={VerifyOtpScreen} />
+     <Stack.Screen
+  name="ConfirmDelete"
+  component={ConfirmDeleteScreen}
+  options={{ headerShown: false }}
+/>
 
 
           {/* Dynamic Screens */}
