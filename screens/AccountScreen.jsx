@@ -161,7 +161,7 @@ export default function AccountScreen() {
               <Image source={require('../assets/changepass.png')} style={styles.iconImage} />
               <Text style={styles.label}>Change Password</Text>
             </View>
-            <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
+            <Feather name="chevron-right" size={responsiveSize(20)} color="#999" /> 
           </TouchableOpacity>
 
        <TouchableOpacity
@@ -225,7 +225,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#05141A',
-    justifyContent: 'center',
+    justifyContent: 'center', 
     alignItems: 'center',
     paddingBottom: 16,
   },

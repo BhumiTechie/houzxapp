@@ -7,17 +7,55 @@ import {
   SafeAreaView,
   Platform,
   StatusBar,
+  Alert,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
+// If you're using Firebase, uncomment these
+// import { getAuth, deleteUser } from 'firebase/auth';
 
 export default function ConfirmDeleteScreen() {
   const navigation = useNavigation();
 
-  const handleDelete = () => {
-    // Handle actual account deletion here
-    console.log('Account Deleted');
-    // Example: call API, clear user data, then navigate away
+  const handleDelete = async () => {
+    Alert.alert(
+      'Confirm Deletion',
+      'Are you sure you want to permanently delete your account?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              // 🔁 Replace this block with your own backend deletion logic
+
+              // Example with Firebase Auth:
+              // const auth = getAuth();
+              // const user = auth.currentUser;
+              // await deleteUser(user);
+
+              // Example with REST API:
+              // await fetch('https://your-api.com/delete-account', {
+              //   method: 'DELETE',
+              //   headers: {
+              //     Authorization: `Bearer YOUR_AUTH_TOKEN`,
+              //   },
+              // });
+
+              // ✅ Navigate to login screen after deletion
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Welcome' }], // Replace 'Login' with your login screen name
+              });
+            } catch (error) {
+              Alert.alert('Error', 'Failed to delete account. Please try again.');
+              console.error(error);
+            }
+          },
+        },
+      ]
+    );
   };
 
   const handleGoBack = () => {
@@ -77,6 +115,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: '600',
+    left:'70'
   },
   content: {
     padding: 20,
@@ -89,7 +128,7 @@ const styles = StyleSheet.create({
   },
   subText: {
     fontSize: 14,
-    color: '#666',
+    color: '#5E5E5E',
     marginBottom: 12,
   },
   buttonContainer: {
