@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -9,13 +9,13 @@ import {
   Dimensions,
   Platform,
   StatusBar,
-  Alert,
 } from 'react-native';
 import { useUser } from '../context/UserContext';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import * as ImagePicker from 'expo-image-picker';
+import Modal from 'react-native-modal';
 
 const { width } = Dimensions.get('window');
 const baseWidth = 414;
@@ -23,7 +23,8 @@ const scale = width / baseWidth;
 const responsiveSize = (size) => Math.round(size * scale);
 
 export default function AccountScreen() {
-  const { user, updateUser } = useUser(); // Make sure updateUser is available in your context
+  const { user, updateUser, logout } = useUser();
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
 
@@ -50,8 +51,6 @@ export default function AccountScreen() {
 
       if (!result.canceled) {
         const selectedImage = result.assets[0].uri;
-        console.log('Selected image URI:', selectedImage);
-
         if (updateUser) {
           updateUser({ ...user, profileImage: selectedImage });
         }
@@ -61,13 +60,16 @@ export default function AccountScreen() {
     }
   };
 
+  const handleSignOut = () => {
+    setShowSignOutModal(true);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f0f2f5' }}>
       <ScrollView
         style={styles.container}
         contentContainerStyle={{ paddingBottom: insets.bottom + responsiveSize(20) }}
       >
-        {/* Header */}
         <View style={[styles.header, { paddingTop: headerPaddingTop }]}>
           <Text style={styles.title}>Account</Text>
         </View>
@@ -85,12 +87,7 @@ export default function AccountScreen() {
             </View>
             <TouchableOpacity style={styles.avatarWrapper} onPress={pickImage}>
               <Image
-                source={{
-                  uri: user?.profileImage || 'https://via.placeholder.com/64',
-                }}
-                onError={(e) => {
-                  console.warn('Avatar image failed to load', e.nativeEvent.error);
-                }}
+                source={{ uri: user?.profileImage || 'https://via.placeholder.com/64' }}
                 style={styles.avatar}
                 resizeMode="cover"
               />
@@ -117,10 +114,11 @@ export default function AccountScreen() {
             </View>
             <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
           </TouchableOpacity>
-<TouchableOpacity
-  style={styles.profileRow}
-  onPress={() => navigation.navigate('MyAds')} // ✅ ADD THIS
->
+
+          <TouchableOpacity
+            style={styles.profileRow}
+            onPress={() => navigation.navigate('MyAds')}
+          >
             <View style={styles.rowLeft}>
               <Image source={require('../assets/myads.png')} style={styles.iconImage} />
               <Text style={styles.profileText}>My Ads</Text>
@@ -133,48 +131,29 @@ export default function AccountScreen() {
         <View style={styles.Accountsection}>
           <Text style={styles.accountSectionTitle}>ACCOUNT SETTINGS</Text>
 
-     <TouchableOpacity
-  style={styles.row}
-  onPress={() => navigation.navigate('ChangeEmail')} // 👈 Add this line
->
-  <View style={styles.rowLeft}>
-    <Image source={require('../assets/emailchange.png')} style={styles.iconImage} />
-    <Text style={styles.label}>Change Email</Text>
-  </View>
-  <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
-</TouchableOpacity>
+          <TouchableOpacity style={styles.row} onPress={() => navigation.navigate('ChangeEmail')}>
+            <View style={styles.rowLeft}>
+              <Image source={require('../assets/emailchange.png')} style={styles.iconImage} />
+              <Text style={styles.label}>Change Email</Text>
+            </View>
+            <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
+          </TouchableOpacity>
 
-<TouchableOpacity
-  style={styles.row}
-  onPress={() => navigation.navigate('ChangePassword')} // 👈 Add this line
->
-  <View style={styles.rowLeft}>
-    <Image source={require('../assets/changepass.png')} style={styles.iconImage} />
-    <Text style={styles.label}>Change Password</Text>
-  </View>
-  <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
-</TouchableOpacity>
-
-
-          <TouchableOpacity style={styles.row}>
+          <TouchableOpacity style={styles.row} onPress={() => navigation.navigate('ChangePassword')}>
             <View style={styles.rowLeft}>
               <Image source={require('../assets/changepass.png')} style={styles.iconImage} />
               <Text style={styles.label}>Change Password</Text>
             </View>
-            <Feather name="chevron-right" size={responsiveSize(20)} color="#999" /> 
+            <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
           </TouchableOpacity>
 
-       <TouchableOpacity
-  style={styles.row}
-  onPress={() => navigation.navigate('ConfirmDelete')}
->
-  <View style={styles.rowLeft}>
-    <Image source={require('../assets/delete.png')} style={styles.iconImage} />
-    <Text style={styles.label}>Delete Account</Text>
-  </View>
-  <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
-</TouchableOpacity>
-
+          <TouchableOpacity style={styles.row} onPress={() => navigation.navigate('ConfirmDelete')}>
+            <View style={styles.rowLeft}>
+              <Image source={require('../assets/delete.png')} style={styles.iconImage} />
+              <Text style={styles.label}>Delete Account</Text>
+            </View>
+            <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
+          </TouchableOpacity>
         </View>
 
         {/* Legal */}
@@ -200,24 +179,66 @@ export default function AccountScreen() {
 
         {/* Bottom Section */}
         <View style={styles.bottomSection}>
-          <View style={styles.doubleActionRow}>
-            <TouchableOpacity style={styles.actionBox}>
-              <Feather name="share-2" size={responsiveSize(20)} />
-              <Text style={styles.actionLabel}>Share App</Text>
-            </TouchableOpacity>
+          <TouchableOpacity style={styles.row} onPress={() => console.log('Share App')}>
+            <View style={styles.rowLeft}>
+              <Feather name="share-2" size={responsiveSize(20)} color="#000" />
+              <Text style={styles.label}>Share App</Text>
+            </View>
+            <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
+          </TouchableOpacity>
 
-            <TouchableOpacity style={styles.actionBox}>
-              <Feather name="log-out" size={responsiveSize(20)} />
-              <Text style={styles.actionLabel}>Sign Out</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity style={styles.row} onPress={handleSignOut}>
+            <View style={styles.rowLeft}>
+              <Feather name="log-out" size={responsiveSize(20)} color="#000" />
+              <Text style={styles.label}>Sign Out</Text>
+            </View>
+            <Feather name="chevron-right" size={responsiveSize(20)} color="#999" />
+          </TouchableOpacity>
         </View>
+
+        {/* Sign Out Modal */}
+        <Modal
+          isVisible={showSignOutModal}
+          onBackdropPress={() => setShowSignOutModal(false)}
+          backdropOpacity={0.4}
+          animationIn="zoomIn"
+          animationOut="zoomOut"
+        >
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Sign Out?</Text>
+            <Text style={styles.modalMessage}>
+              Are you sure you want to sign out of your account?
+            </Text>
+
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.modalCancel}
+                onPress={() => setShowSignOutModal(false)}
+              >
+                <Text style={styles.modalCancelText}>No</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modalConfirm}
+                onPress={() => {
+                  setShowSignOutModal(false);
+                  logout();
+                  navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Welcome' }],
+                  });
+                }} 
+              >
+                <Text style={styles.modalConfirmText}>Sign out</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-// Styles (same as your original code)
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -225,7 +246,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: '#05141A',
-    justifyContent: 'center', 
+    justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: 16,
   },
@@ -233,7 +254,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: '#fff',
-    textAlign: 'center',
   },
   profileCard: {
     backgroundColor: '#FFFFFF',
@@ -243,7 +263,6 @@ const styles = StyleSheet.create({
     borderRadius: responsiveSize(16),
     borderWidth: 1,
     borderColor: '#fff',
-    justifyContent: 'center',
   },
   profileInfo: {
     flexDirection: 'row',
@@ -270,8 +289,6 @@ const styles = StyleSheet.create({
     position: 'relative',
     width: 64,
     height: 64,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   avatar: {
     width: 64,
@@ -292,7 +309,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   profileSection: {
-    height: responsiveSize(161),
     backgroundColor: '#FFFFFF',
     padding: responsiveSize(12),
     marginHorizontal: responsiveSize(16),
@@ -300,7 +316,6 @@ const styles = StyleSheet.create({
     borderRadius: responsiveSize(16),
     borderWidth: 1,
     borderColor: '#fff',
-    justifyContent: 'center',
   },
   sectionHeader: {
     padding: responsiveSize(12),
@@ -316,7 +331,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: responsiveSize(12),
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
@@ -379,29 +393,64 @@ const styles = StyleSheet.create({
     marginBottom: responsiveSize(8),
   },
   bottomSection: {
-    marginTop: responsiveSize(20),
-    marginHorizontal: responsiveSize(16),
-  },
-  doubleActionRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: responsiveSize(12),
-  },
-  actionBox: {
-    flex: 1,
-    height: responsiveSize(56),
     backgroundColor: '#FFFFFF',
+    padding: responsiveSize(12),
+    marginHorizontal: responsiveSize(16),
+    marginTop: responsiveSize(20),
     borderRadius: responsiveSize(12),
     borderWidth: 1,
-    borderColor: '#F7F7F7',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: responsiveSize(10),
+    borderColor: '#fff',
   },
-  actionLabel: {
-    fontSize: responsiveSize(16),
-    fontWeight: '400',
+
+  // MODAL STYLES
+  modalContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
     color: '#000',
+    marginBottom: 10,
+  },
+  modalMessage: {
+    fontSize: 14,
+    color: '#555',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalCancel: {
+    flex: 1,
+    paddingVertical: 12,
+    marginRight: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#009CA0',
+    alignItems: 'center',
+  },
+  modalCancelText: {
+    color: '#009CA0',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+  modalConfirm: {
+    flex: 1,
+    paddingVertical: 12,
+    marginLeft: 8,
+    borderRadius: 8,
+    backgroundColor: '#009CA0',
+    alignItems: 'center',
+  },
+  modalConfirmText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
   },
 });

@@ -7,10 +7,11 @@ const UserContext = createContext({
   user: defaultUser,
   setUser: () => {},
   updateUser: () => {},
+  logout: () => {}, // Add logout to context shape
 });
 
 export const UserProvider = ({ children }) => {
-  const [user, setUser] = useState(defaultUser); // Always initialized safely
+  const [user, setUser] = useState(defaultUser);
 
   useEffect(() => {
     const loadUser = async () => {
@@ -21,10 +22,10 @@ export const UserProvider = ({ children }) => {
           if (parsed && typeof parsed === 'object' && parsed.email) {
             setUser(parsed);
           } else {
-            setUser(defaultUser); // Fallback if invalid structure
+            setUser(defaultUser);
           }
         } else {
-          setUser(defaultUser); // No user saved
+          setUser(defaultUser);
         }
       } catch (err) {
         console.warn('Failed to load user:', err);
@@ -45,8 +46,17 @@ export const UserProvider = ({ children }) => {
     }
   };
 
+  const logout = async () => {
+    try {
+      await AsyncStorage.removeItem('user');
+    } catch (err) {
+      console.warn('Failed to clear user:', err);
+    }
+    setUser(defaultUser);
+  };
+
   return (
-    <UserContext.Provider value={{ user, setUser, updateUser }}>
+    <UserContext.Provider value={{ user, setUser, updateUser, logout }}>
       {children}
     </UserContext.Provider>
   );
