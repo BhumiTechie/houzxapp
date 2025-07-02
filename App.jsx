@@ -42,11 +42,13 @@ import AccountScreen from './screens/AccountScreen';
 import PersonalDetailsScreen from './screens/PersonalDetailsScreen';
 import ProfileScreen from './screens/ProfileScreen';
 import MyAdsScreen from './screens/MyAdsScreen';
-import EditAdScreen from './screens/EditAdScreen';
+import EditAdScreen from './screens/EditAdScreen'; 
 import { AdProvider } from './context/AdContext';
 import EmailScreen from './screens/EmailScreen';
 import VerifyOtpScreen from './screens/VerifyOtpScreen';
 import ConfirmDeleteScreen from './screens/ConfirmDeleteScreen';
+import MessageListScreen from './screens/MessageListScreen';
+import ChatScreen from './screens/ChatScreen';
 
 
 
@@ -130,6 +132,8 @@ export default function App() {
              <Stack.Screen name="EditAd" component={EditAdScreen} />
            <Stack.Screen name="ChangeEmail" component={EmailScreen} />
            <Stack.Screen name="VerifyOtpScreen" component={VerifyOtpScreen} />
+             <Stack.Screen name="MessagesScreen" component={MessageListScreen} />
+        <Stack.Screen name="ChatScreen" component={ChatScreen} options={{ title: 'Conversation' }} />
      <Stack.Screen
   name="ConfirmDelete"
   component={ConfirmDeleteScreen}
